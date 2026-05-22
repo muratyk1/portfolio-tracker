@@ -533,7 +533,9 @@ function renderOverview() {
     const b = calcOwnerBalance(o);
     const pnl = totalPnL(o);
     const net = b.deposits - b.withdrawals;
-    const finalBal = net + pnl;
+    // Final Balance = free cash + cost basis of open holdings
+    // This equals: deposits - withdrawals - buySpend + sellRevenue + openPositionsCostBasis
+    const finalBal = b.cash + b.openCost;
     totalDeposits += net; totalFinal += finalBal; totalPnLAll += pnl;
     const pnlCls = pnl >= 0 ? 'pos' : 'neg';
     const finalCls = finalBal >= 0 ? 'pos' : 'neg';
@@ -546,9 +548,10 @@ function renderOverview() {
     </tr>`;
   }).join('');
 
-  const shownDeposits = selectedOwner ? (() => { const b = calcOwnerBalance(selectedOwner); return b.deposits - b.withdrawals; })() : totalDeposits;
+  const shownB = selectedOwner ? calcOwnerBalance(selectedOwner) : null;
+  const shownDeposits = selectedOwner ? shownB.deposits - shownB.withdrawals : totalDeposits;
   const shownPnL = selectedOwner ? totalPnL(selectedOwner) : totalPnLAll;
-  const shownFinal = shownDeposits + shownPnL;
+  const shownFinal = selectedOwner ? shownB.cash + shownB.openCost : totalFinal;
   const pnlClass = shownPnL >= 0 ? 'pos' : 'neg';
   const pnlSign = shownPnL >= 0 ? '+' : '';
   const finalCls2 = shownFinal >= 0 ? 'pos' : 'neg';
