@@ -357,140 +357,136 @@ function toggleTheme() {
 // CALCULATIONS
 // ══════════════════════════════════════════════
 
-function calcStockPositions(ownerFilter) {
-  const txs = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
+// ── CORE ENGINE ──────────────────────────────────────────────────────────────
+// Single source of truth for all calculations.
+// The $1.50 fee is a flat cost per transaction, shared proportionally.
+// For an owner with fraction F of a transaction:
+//   Buy:  owner pays  (qty * price + 1.50) * F
+//   Sell: owner gets  (qty * price - 1.50) * F
+// This keeps cash-flow and P&L perfectly consistent.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Replay all (or filtered) transactions and return per-owner state.
+// ownerFilter: string → only that owner's proportional slice
+//              null   → aggregate full-portfolio view (fractions sum to whole)
+// upToDate:    ISO date string → only include txs strictly before this date
+//              null            → include all txs
+function _replayTxs(ownerFilter, upToDate) {
+  // Use original array index as tiebreaker so same-day transactions
+  // are always processed in the order you entered them.
+  const indexMap = new Map(state.transactions.map((tx, i) => [tx.id, i]));
+
+  const txs = [...state.transactions]
+    .filter(tx => !upToDate || new Date(tx.date) < new Date(upToDate))
+    .sort((a, b) => {
+      const dateDiff = new Date(a.date) - new Date(b.date);
+      if (dateDiff !== 0) return dateDiff;
+      return (indexMap.get(a.id) ?? 0) - (indexMap.get(b.id) ?? 0);
+    });
+
+  let cash = 0, deposits = 0, withdrawals = 0;
+  // positions[ticker] = array of FIFO lots { qty, unitCost }
   const positions = {};
+  // realized P&L per ticker
+  const realized = {};
 
   for (const tx of txs) {
-    if (tx.type === 'deposit' || tx.type === 'withdraw') continue;
-    let fraction = 1;
-    if (ownerFilter && tx.shares) fraction = (tx.shares[ownerFilter] || 0) / 100;
+    // fraction: how much of this transaction belongs to the view we're calculating
+    const frac = ownerFilter
+      ? (tx.shares ? (tx.shares[ownerFilter] || 0) / 100 : 0)
+      : 1; // full transaction for portfolio view
 
-    if (!positions[tx.ticker]) positions[tx.ticker] = { lots: [], realizedPnL: 0, txCount: 0 };
-    const pos = positions[tx.ticker];
-    pos.txCount++;
+    if (frac === 0) continue;
 
-    const grossAmt = tx.qty * tx.price;
-    const totalFee = TX_COST; // always 1 fee per transaction now
+    if (tx.type === 'deposit') {
+      const amt = tx.amount * frac;
+      cash += amt; deposits += amt;
 
-    if (tx.type === 'buy') {
-      const cost = (grossAmt + totalFee) * fraction;
-      const qty = tx.qty * fraction;
-      pos.lots.push({ qty, unitCost: qty > 0 ? cost / qty : 0 });
+    } else if (tx.type === 'withdraw') {
+      const amt = tx.amount * frac;
+      cash -= amt; withdrawals += amt;
+
+    } else if (tx.type === 'buy') {
+      // Total cost = (gross + fee) * fraction
+      const gross = tx.qty * tx.price;
+      const totalCost = (gross + TX_COST) * frac;
+      const qty = tx.qty * frac;
+      cash -= totalCost;
+      if (!positions[tx.ticker]) positions[tx.ticker] = [];
+      positions[tx.ticker].push({ qty, unitCost: qty > 0 ? totalCost / qty : 0 });
+      if (!realized[tx.ticker]) realized[tx.ticker] = 0;
+
     } else if (tx.type === 'sell') {
-      const revenue = (grossAmt - totalFee) * fraction;
-      const sellQty = tx.qty * fraction;
-      let remaining = sellQty, costBasis = 0;
-      while (remaining > 0 && pos.lots.length > 0) {
-        const lot = pos.lots[0];
-        const use = Math.min(remaining, lot.qty);
+      // Revenue = (gross - fee) * fraction
+      const gross = tx.qty * tx.price;
+      const revenue = (gross - TX_COST) * frac;
+      const sellQty = tx.qty * frac;
+      cash += revenue;
+
+      // FIFO: match sell qty against buy lots to compute realized P&L
+      if (!realized[tx.ticker]) realized[tx.ticker] = 0;
+      if (!positions[tx.ticker]) positions[tx.ticker] = [];
+      let rem = sellQty, costBasis = 0;
+      while (rem > 0.00000001 && positions[tx.ticker].length > 0) {
+        const lot = positions[tx.ticker][0];
+        const use = Math.min(rem, lot.qty);
         costBasis += use * lot.unitCost;
-        remaining -= use; lot.qty -= use;
-        if (lot.qty < 0.00000001) pos.lots.shift();
+        lot.qty -= use; rem -= use;
+        if (lot.qty < 0.00000001) positions[tx.ticker].shift();
       }
-      pos.realizedPnL += revenue - costBasis;
+      realized[tx.ticker] += revenue - costBasis;
     }
   }
 
+  // Summarise open positions
+  const openPositions = {};
+  for (const [ticker, lots] of Object.entries(positions)) {
+    const qty = lots.reduce((s, l) => s + l.qty, 0);
+    const totalCost = lots.reduce((s, l) => s + l.qty * l.unitCost, 0);
+    if (qty > 0.00000001) {
+      openPositions[ticker] = { qty, avgCost: qty > 0 ? totalCost / qty : 0, totalCost };
+    }
+  }
+
+  const openCost = Object.values(openPositions).reduce((s, p) => s + p.totalCost, 0);
+
+  return { cash, deposits, withdrawals, openCost, openPositions, realized };
+}
+
+// Public helpers used by the UI
+function calcStockPositions(ownerFilter) {
+  const { realized, openPositions } = _replayTxs(ownerFilter, null);
+
   const result = {};
-  for (const [ticker, pos] of Object.entries(positions)) {
-    const qty = pos.lots.reduce((s, l) => s + l.qty, 0);
-    const totalCost = pos.lots.reduce((s, l) => s + l.qty * l.unitCost, 0);
-    result[ticker] = { qty, avgCost: qty > 0 ? totalCost / qty : 0, totalCost, realizedPnL: pos.realizedPnL, txCount: pos.txCount, open: qty > 0.00000001 };
+  const allTickers = new Set([...Object.keys(realized), ...Object.keys(openPositions)]);
+  for (const ticker of allTickers) {
+    const open = openPositions[ticker];
+    result[ticker] = {
+      qty:         open ? open.qty     : 0,
+      avgCost:     open ? open.avgCost : 0,
+      totalCost:   open ? open.totalCost : 0,
+      realizedPnL: realized[ticker] || 0,
+      open:        !!open,
+      txCount:     state.transactions.filter(tx =>
+                     tx.ticker === ticker &&
+                     (tx.type === 'buy' || tx.type === 'sell')).length
+    };
   }
   return result;
 }
 
-// Returns the running total balance of an owner up to (but NOT including) a given date/index
-// Used for proportional split calculation
-function calcOwnerBalanceAtDate(ownerName, beforeDate) {
-  const txs = [...state.transactions]
-    .filter(tx => new Date(tx.date) < new Date(beforeDate))
-    .sort((a,b) => new Date(a.date) - new Date(b.date));
-
-  let cash = 0;
-  const positions = {};
-
-  for (const tx of txs) {
-    const frac = tx.shares ? (tx.shares[ownerName] || 0) / 100 : 1;
-    if (tx.type === 'deposit') {
-      cash += tx.amount * frac;
-    } else if (tx.type === 'withdraw') {
-      cash -= tx.amount * frac;
-    } else {
-      const fee = TX_COST * frac;
-      const gross = tx.qty * tx.price * frac;
-      if (tx.type === 'buy') {
-        cash -= (gross + fee);
-        if (!positions[tx.ticker]) positions[tx.ticker] = [];
-        const qty = tx.qty * frac;
-        positions[tx.ticker].push({ qty, unitCost: qty > 0 ? (gross + fee) / qty : 0 });
-      } else if (tx.type === 'sell') {
-        cash += (gross - fee);
-        const sellQty = tx.qty * frac;
-        let rem = sellQty;
-        if (positions[tx.ticker]) {
-          while (rem > 0 && positions[tx.ticker].length > 0) {
-            const lot = positions[tx.ticker][0];
-            const use = Math.min(rem, lot.qty);
-            rem -= use; lot.qty -= use;
-            if (lot.qty < 0.00000001) positions[tx.ticker].shift();
-          }
-        }
-      }
-    }
-  }
-
-  // Add market value of open positions (at cost, since we don't have live prices)
-  let investedValue = 0;
-  for (const lots of Object.values(positions)) {
-    for (const lot of lots) investedValue += lot.qty * lot.unitCost;
-  }
-
-  return cash + investedValue; // total balance = free cash + current cost basis of holdings
+function calcOwnerBalance(ownerName) {
+  return _replayTxs(ownerName, null);
 }
 
-function calcOwnerBalance(ownerName) {
-  const txs = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
-  let cash = 0, deposits = 0, withdrawals = 0;
-  const positions = {};
-
-  for (const tx of txs) {
-    const frac = tx.shares ? (tx.shares[ownerName] || 0) / 100 : 1;
-    if (tx.type === 'deposit') {
-      const amt = tx.amount * frac; cash += amt; deposits += amt;
-    } else if (tx.type === 'withdraw') {
-      const amt = tx.amount * frac; cash -= amt; withdrawals += amt;
-    } else {
-      const fee = TX_COST * frac;
-      const gross = tx.qty * tx.price * frac;
-      if (tx.type === 'buy') {
-        const total = gross + fee; cash -= total;
-        if (!positions[tx.ticker]) positions[tx.ticker] = [];
-        const qty = tx.qty * frac;
-        positions[tx.ticker].push({ qty, unitCost: qty > 0 ? total / qty : 0 });
-      } else if (tx.type === 'sell') {
-        cash += (gross - fee);
-        const sellQty = tx.qty * frac;
-        let rem = sellQty;
-        if (positions[tx.ticker]) {
-          while (rem > 0 && positions[tx.ticker].length > 0) {
-            const lot = positions[tx.ticker][0];
-            const use = Math.min(rem, lot.qty);
-            rem -= use; lot.qty -= use;
-            if (lot.qty < 0.00000001) positions[tx.ticker].shift();
-          }
-        }
-      }
-    }
-  }
-  let openCost = 0;
-  for (const lots of Object.values(positions)) for (const lot of lots) openCost += lot.qty * lot.unitCost;
-  return { cash, deposits, withdrawals, openCost };
+function calcOwnerBalanceAtDate(ownerName, beforeDate) {
+  const { cash, openCost } = _replayTxs(ownerName, beforeDate);
+  return cash + openCost;
 }
 
 function totalPnL(ownerFilter) {
-  return Object.values(calcStockPositions(ownerFilter)).reduce((s, p) => s + p.realizedPnL, 0);
+  const { realized } = _replayTxs(ownerFilter, null);
+  return Object.values(realized).reduce((s, v) => s + v, 0);
 }
 
 // ══════════════════════════════════════════════
