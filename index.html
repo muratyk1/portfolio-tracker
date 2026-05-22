@@ -369,15 +369,22 @@ function toggleTheme() {
 // Replay all (or filtered) transactions and return per-owner state.
 // ownerFilter: string → only that owner's proportional slice
 //              null   → aggregate full-portfolio view (fractions sum to whole)
-// upToDate:    ISO date string → only include txs strictly before this date
+// upToDate:    ISO date string → only include txs strictly before this date (date filter)
 //              null            → include all txs
-function _replayTxs(ownerFilter, upToDate) {
+// beforeIndex: number → only include txs with insertion index < beforeIndex (index filter)
+//              null   → no index filter
+// When both are set, a tx is included only if it passes BOTH filters.
+function _replayTxs(ownerFilter, upToDate, beforeIndex) {
   // Use original array index as tiebreaker so same-day transactions
   // are always processed in the order you entered them.
   const indexMap = new Map(state.transactions.map((tx, i) => [tx.id, i]));
 
   const txs = [...state.transactions]
-    .filter(tx => !upToDate || new Date(tx.date) < new Date(upToDate))
+    .filter(tx => {
+      if (upToDate && new Date(tx.date) >= new Date(upToDate)) return false;
+      if (beforeIndex != null && (indexMap.get(tx.id) ?? 0) >= beforeIndex) return false;
+      return true;
+    })
     .sort((a, b) => {
       const dateDiff = new Date(a.date) - new Date(b.date);
       if (dateDiff !== 0) return dateDiff;
@@ -479,8 +486,8 @@ function calcOwnerBalance(ownerName) {
   return _replayTxs(ownerName, null);
 }
 
-function calcOwnerBalanceAtDate(ownerName, beforeDate) {
-  const { cash, openCost } = _replayTxs(ownerName, beforeDate);
+function calcOwnerBalanceAtDate(ownerName, beforeDate, beforeIndex) {
+  const { cash, openCost } = _replayTxs(ownerName, beforeDate, beforeIndex);
   return cash + openCost;
 }
 
@@ -674,7 +681,7 @@ function txCard(tx, showDelete = false) {
         <span class="tx-name">${tx.ticker||'Cash'}</span>
         <span class="tx-amount ${amtClass}">${sign}${fmt(netAmt)}</span>
       </div>
-      <div class="tx-meta">${tx.date}${tx.qty ? ` · ${tx.qty} @ $${tx.price}` : ''} · $${TX_COST} fee</div>
+      <div class="tx-meta">${tx.date}${tx.qty ? ` · ${tx.qty} @ $${tx.price} · $${TX_COST} fee` : ''}</div>
       ${tx.note ? `<div class="tx-meta" style="color:var(--muted)">${tx.note}</div>` : ''}
       ${ownersStr ? `<div class="tx-owners">${ownersStr}</div>` : ''}
     </div>
@@ -851,12 +858,13 @@ function onSellTickerChange(ticker) {
 }
 
 function setProportionalSplit() {
-  // Use total balance at the time of this transaction's date (current form date)
-  const refDate = formState.date || new Date().toISOString().slice(0,10);
-  // Add one day to include today's earlier transactions, but use strictly-before for new tx
+  // Include ALL already-saved transactions (regardless of date), since the user
+  // has entered them in the correct chronological order. The new transaction
+  // being added is not yet saved, so state.transactions.length is the right cutoff.
+  const beforeIndex = state.transactions.length; // all saved txs, none of the new one
   const balances = {};
   state.owners.forEach(o => {
-    balances[o] = Math.max(0, calcOwnerBalanceAtDate(o, refDate));
+    balances[o] = Math.max(0, calcOwnerBalanceAtDate(o, null, beforeIndex));
   });
   const totalBal = Object.values(balances).reduce((s,v) => s+v, 0);
 
