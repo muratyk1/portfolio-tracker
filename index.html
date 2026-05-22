@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Portfolio Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #6ee7b7;
+    --accent2: #f59e0b;
+    --red: #f87171;
+    --green: #6ee7b7;
+    --text: #e8e8f0;
+    --muted: #6b7080;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100dvh;
+    overscroll-behavior: none;
+  }
+
+  /* ── LAYOUT ── */
+  #app { display: flex; flex-direction: column; min-height: 100dvh; }
+
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px 10px;
+  }
+  header h1 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em; }
+  header h1 span { color: var(--accent); }
+
+  .nav-tabs {
+    display: flex; gap: 4px; margin-top: 10px;
+    background: var(--surface); border-radius: 8px; padding: 3px;
+  }
+  .nav-tab {
+    flex: 1; padding: 6px 4px; border: none; background: transparent;
+    color: var(--muted); font-family: 'Syne', sans-serif;
+    font-size: 0.7rem; font-weight: 600; border-radius: 6px;
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .nav-tab.active { background: var(--surface2); color: var(--accent); }
+
+  main { flex: 1; padding: 16px; overflow: hidden; }
+
+  /* ── OWNER SELECTOR ── */
+  .owner-pills {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .pill {
+    padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--muted);
+    font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    transition: all 0.15s; font-family: 'Syne', sans-serif;
+  }
+  .pill.active { border-color: var(--accent); color: var(--accent); background: rgba(110,231,183,0.08); }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px; margin-bottom: 12px;
+  }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .card-title { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; }
+  .card-value { font-size: 1.5rem; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .card-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; font-family: 'DM Mono', monospace; }
+
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+  .stat-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+  .stat-val { font-size: 1.1rem; font-weight: 700; font-family: 'DM Mono', monospace; }
+
+  /* ── COLORS ── */
+  .pos { color: var(--green); }
+  .neg { color: var(--red); }
+  .neu { color: var(--text); }
+
+  /* ── STOCK TABLE ── */
+  .stock-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; margin-bottom: 8px;
+    cursor: pointer; transition: border-color 0.15s;
+  }
+  .stock-item:active { border-color: var(--accent); }
+  .stock-top { display: flex; justify-content: space-between; align-items: center; }
+  .stock-name { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.03em; }
+  .stock-pnl { font-size: 1rem; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .stock-detail { margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .sdet { font-size: 0.68rem; color: var(--muted); }
+  .sdet span { display: block; color: var(--text); font-family: 'DM Mono', monospace; font-size: 0.78rem; font-weight: 500; }
+
+  /* ── TRANSACTIONS ── */
+  .tx-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 11px 14px; margin-bottom: 8px;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .tx-badge {
+    min-width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 800; letter-spacing: 0.04em; flex-shrink: 0;
+  }
+  .tx-badge.buy { background: rgba(110,231,183,0.12); color: var(--green); }
+  .tx-badge.sell { background: rgba(248,113,113,0.12); color: var(--red); }
+  .tx-badge.dep { background: rgba(245,158,11,0.12); color: var(--accent2); }
+  .tx-badge.wit { background: rgba(107,112,128,0.15); color: var(--muted); }
+  .tx-info { flex: 1; min-width: 0; }
+  .tx-top { display: flex; justify-content: space-between; align-items: baseline; }
+  .tx-name { font-size: 0.88rem; font-weight: 700; }
+  .tx-amount { font-size: 0.88rem; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .tx-meta { font-size: 0.7rem; color: var(--muted); margin-top: 2px; font-family: 'DM Mono', monospace; }
+  .tx-pnl { font-size: 0.72rem; font-weight: 600; font-family: 'DM Mono', monospace; margin-top: 2px; }
+  .tx-owners { font-size: 0.67rem; color: var(--muted); margin-top: 3px; }
+
+  /* ── ADD TRANSACTION FORM ── */
+  .form-section { margin-bottom: 14px; }
+  .form-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; display: block; }
+  .form-input {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: 0.88rem;
+    outline: none; transition: border-color 0.15s; -webkit-appearance: none;
+  }
+  .form-input:focus { border-color: var(--accent); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .type-btns { display: flex; gap: 6px; }
+  .type-btn {
+    flex: 1; padding: 9px 6px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--muted);
+    font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; text-align: center;
+  }
+  .type-btn.active-buy { border-color: var(--green); color: var(--green); background: rgba(110,231,183,0.08); }
+  .type-btn.active-sell { border-color: var(--red); color: var(--red); background: rgba(248,113,113,0.08); }
+  .type-btn.active-dep { border-color: var(--accent2); color: var(--accent2); background: rgba(245,158,11,0.08); }
+  .type-btn.active-wit { border-color: var(--muted); color: var(--text); background: rgba(107,112,128,0.1); }
+
+  .owners-check { display: flex; flex-wrap: wrap; gap: 6px; }
+  .owner-check-btn {
+    padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--muted);
+    font-size: 0.75rem; font-weight: 600; cursor: pointer;
+    font-family: 'Syne', sans-serif; transition: all 0.15s;
+  }
+  .owner-check-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(110,231,183,0.08); }
+
+  .pct-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .pct-input-wrap { display: flex; align-items: center; gap: 4px; }
+  .pct-label { font-size: 0.72rem; color: var(--accent); font-weight: 600; min-width: 46px; }
+  .pct-input {
+    width: 60px; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 8px; color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: 0.82rem;
+    outline: none; -webkit-appearance: none; text-align: right;
+  }
+  .pct-input:focus { border-color: var(--accent); }
+
+  .pct-total { font-size: 0.72rem; font-family: 'DM Mono', monospace; margin-top: 6px; }
+
+  .submit-btn {
+    width: 100%; padding: 13px; border: none; border-radius: 10px;
+    background: var(--accent); color: #0a0a0f;
+    font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 800;
+    cursor: pointer; transition: opacity 0.15s; letter-spacing: 0.02em;
+    margin-top: 6px;
+  }
+  .submit-btn:active { opacity: 0.8; }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .danger-btn {
+    padding: 6px 12px; border: 1px solid rgba(248,113,113,0.3); border-radius: 7px;
+    background: transparent; color: var(--red);
+    font-family: 'Syne', sans-serif; font-size: 0.7rem; font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* ── EMPTY ── */
+  .empty { text-align: center; color: var(--muted); padding: 40px 16px; font-size: 0.85rem; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 18px; font-size: 0.82rem; font-weight: 600;
+    opacity: 0; transition: all 0.25s; z-index: 999; white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,10,0.85); backdrop-filter: blur(4px);
+    padding: 24px 16px; overflow-y: auto;
+  }
+  .modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px; width: 100%; max-width: 480px;
+    margin: auto;
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .modal-title { font-size: 1rem; font-weight: 800; }
+  .close-btn { background: none; border: none; color: var(--muted); font-size: 1.3rem; cursor: pointer; padding: 4px; }
+
+  select.form-input { cursor: pointer; }
+  option { background: var(--surface2); }
+
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+  .section-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+
+  /* ── SUMMARY BARS ── */
+  .owner-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .owner-row:last-child { border-bottom: none; }
+  .owner-n { font-size: 0.85rem; font-weight: 600; }
+  .owner-vals { text-align: right; }
+  .owner-bal { font-size: 0.88rem; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .owner-pnl-s { font-size: 0.72rem; font-family: 'DM Mono', monospace; }
+
+  .scrollable { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+  /* ── EXPORT ── */
+  .action-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .action-btn {
+    flex: 1; padding: 9px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); color: var(--text);
+    font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 700;
+    cursor: pointer; text-align: center;
+  }
+  .action-btn:active { border-color: var(--accent); color: var(--accent); }
+
+  .progress-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 2px; background: var(--accent); transition: width 0.3s; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>Portfolio <span>Tracker</span></h1>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showTab('overview')">Overview</button>
+      <button class="nav-tab" onclick="showTab('stocks')">Stocks</button>
+      <button class="nav-tab" onclick="showTab('transactions')">Transactions</button>
+      <button class="nav-tab" onclick="showTab('add')">+ Add</button>
+    </div>
+  </header>
+  <main id="main-content"></main>
+</div>
+
+<!-- ADD TRANSACTION MODAL (reuse area instead) -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Transaction</span>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+const STORAGE_KEY = 'portfolio_v2';
+const TX_COST = 1.5;
+
+let state = {
+  owners: ['Murat', 'Yusuf', 'Cüneyt'],
+  // shares: { ownerName: percentage (0-100) }
+  // Each transaction: { id, date, type:'buy'|'sell'|'deposit'|'withdraw', ticker, qty, price, shares:{}, note }
+  transactions: []
+};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) state = JSON.parse(raw);
+    // Migrate old data if needed
+    if (!state.owners) state.owners = ['Murat', 'Yusuf', 'Cüneyt'];
+    if (!state.transactions) state.transactions = [];
+  } catch(e) {}
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// ══════════════════════════════════════════════
+// CALCULATIONS
+// ══════════════════════════════════════════════
+
+// Returns { ticker -> { avgCost, qty, totalCost, realizedPnL, txCount } } for a given owner filter
+// If owner is null, aggregate all
+function calcStockPositions(ownerFilter) {
+  // Process buy/sell in chronological order
+  const txs = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
+  const positions = {}; // ticker -> { lots: [{qty, unitCost}], realizedPnL, txCount }
+
+  for (const tx of txs) {
+    if (tx.type === 'deposit' || tx.type === 'withdraw') continue;
+
+    // Determine fraction for this owner
+    let fraction = 1;
+    if (ownerFilter && tx.shares) {
+      fraction = (tx.shares[ownerFilter] || 0) / 100;
+    }
+
+    if (!positions[tx.ticker]) {
+      positions[tx.ticker] = { lots: [], realizedPnL: 0, txCount: 0 };
+    }
+    const pos = positions[tx.ticker];
+    pos.txCount++;
+
+    const grossAmt = tx.qty * tx.price;
+    const numCosts = tx.txCostCount || 1;
+    const totalCost = TX_COST * numCosts;
+
+    if (tx.type === 'buy') {
+      const cost = (grossAmt + totalCost) * fraction;
+      const qty = tx.qty * fraction;
+      pos.lots.push({ qty, unitCost: qty > 0 ? cost / qty : 0 });
+    } else if (tx.type === 'sell') {
+      const revenue = (grossAmt - totalCost) * fraction;
+      const sellQty = tx.qty * fraction;
+      // FIFO
+      let remaining = sellQty;
+      let costBasis = 0;
+      while (remaining > 0 && pos.lots.length > 0) {
+        const lot = pos.lots[0];
+        const use = Math.min(remaining, lot.qty);
+        costBasis += use * lot.unitCost;
+        remaining -= use;
+        lot.qty -= use;
+        if (lot.qty < 0.0001) pos.lots.shift();
+      }
+      pos.realizedPnL += revenue - costBasis;
+    }
+  }
+
+  // Build summary
+  const result = {};
+  for (const [ticker, pos] of Object.entries(positions)) {
+    const qty = pos.lots.reduce((s, l) => s + l.qty, 0);
+    const totalCost = pos.lots.reduce((s, l) => s + l.qty * l.unitCost, 0);
+    result[ticker] = {
+      qty,
+      avgCost: qty > 0 ? totalCost / qty : 0,
+      totalCost,
+      realizedPnL: pos.realizedPnL,
+      txCount: pos.txCount,
+      open: qty > 0.0001
+    };
+  }
+  return result;
+}
+
+function calcOwnerBalance(ownerName) {
+  // Net cash: deposits - withdrawals - buys + sells
+  const txs = [...state.transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
+  let cash = 0;
+  let invested = 0;
+  let realizedPnL = 0;
+  let deposits = 0;
+  let withdrawals = 0;
+
+  const positions = {}; // FIFO lots
+
+  for (const tx of txs) {
+    const frac = tx.shares ? (tx.shares[ownerName] || 0) / 100 : 1;
+
+    if (tx.type === 'deposit') {
+      const amt = tx.amount * frac;
+      cash += amt; deposits += amt;
+    } else if (tx.type === 'withdraw') {
+      const amt = tx.amount * frac;
+      cash -= amt; withdrawals += amt;
+    } else {
+      const numCosts = tx.txCostCount || 1;
+      const costAmt = TX_COST * numCosts * frac;
+      const gross = tx.qty * tx.price * frac;
+
+      if (tx.type === 'buy') {
+        const total = gross + costAmt;
+        cash -= total; invested += total;
+        if (!positions[tx.ticker]) positions[tx.ticker] = [];
+        positions[tx.ticker].push({ qty: tx.qty * frac, unitCost: (tx.qty * frac) > 0 ? total / (tx.qty * frac) : 0 });
+      } else if (tx.type === 'sell') {
+        const revenue = gross - costAmt;
+        cash += revenue;
+        const sellQty = tx.qty * frac;
+        let rem = sellQty; let cb = 0;
+        if (positions[tx.ticker]) {
+          while (rem > 0 && positions[tx.ticker].length > 0) {
+            const lot = positions[tx.ticker][0];
+            const use = Math.min(rem, lot.qty);
+            cb += use * lot.unitCost;
+            rem -= use; lot.qty -= use;
+            if (lot.qty < 0.0001) positions[tx.ticker].shift();
+          }
+        }
+        realizedPnL += revenue - cb;
+      }
+    }
+  }
+
+  // Unrealized
+  let unrealized = 0;
+  let openCost = 0;
+  for (const [, lots] of Object.entries(positions)) {
+    for (const lot of lots) {
+      openCost += lot.qty * lot.unitCost;
+    }
+  }
+
+  return { cash, deposits, withdrawals, realizedPnL, openCost };
+}
+
+function totalPnL(ownerFilter) {
+  const pos = calcStockPositions(ownerFilter);
+  return Object.values(pos).reduce((s, p) => s + p.realizedPnL, 0);
+}
+
+// ══════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════
+let currentTab = 'overview';
+let selectedOwner = null; // null = all
+
+function showTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.nav-tab').forEach((el, i) => {
+    el.classList.toggle('active', ['overview','stocks','transactions','add'][i] === tab);
+  });
+  renderMain();
+}
+
+function renderMain() {
+  const el = document.getElementById('main-content');
+  if (currentTab === 'overview') el.innerHTML = renderOverview();
+  else if (currentTab === 'stocks') el.innerHTML = renderStocks();
+  else if (currentTab === 'transactions') el.innerHTML = renderTransactions();
+  else if (currentTab === 'add') el.innerHTML = renderAddForm();
+}
+
+// ══════════════════════════════════════════════
+// OWNER PILLS
+// ══════════════════════════════════════════════
+function ownerPills() {
+  const all = [null, ...state.owners];
+  return `<div class="owner-pills">
+    ${all.map(o => `<button class="pill ${selectedOwner === o ? 'active' : ''}" onclick="selectOwner(${o === null ? 'null' : `'${o}'`})">${o || 'All'}</button>`).join('')}
+  </div>`;
+}
+
+function selectOwner(o) {
+  selectedOwner = o;
+  renderMain();
+}
+
+// ══════════════════════════════════════════════
+// OVERVIEW TAB
+// ══════════════════════════════════════════════
+function renderOverview() {
+  const realized = totalPnL(selectedOwner);
+  const pnlClass = realized >= 0 ? 'pos' : 'neg';
+  const pnlSign = realized >= 0 ? '+' : '';
+
+  // Per-owner summary
+  const ownerRows = state.owners.map(o => {
+    const b = calcOwnerBalance(o);
+    const pnl = totalPnL(o);
+    const pnlCls = pnl >= 0 ? 'pos' : 'neg';
+    const sign = pnl >= 0 ? '+' : '';
+    return `<div class="owner-row">
+      <div class="owner-n">${o}</div>
+      <div class="owner-vals">
+        <div class="owner-bal">${fmt(b.deposits - b.withdrawals)} dep.</div>
+        <div class="owner-pnl-s ${pnlCls}">${sign}${fmt(pnl)} realized</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Recent transactions
+  const recent = [...state.transactions].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,5);
+  const recentHTML = recent.length === 0 ? '<div class="empty">No transactions yet</div>'
+    : recent.map(tx => txCard(tx)).join('');
+
+  return `
+    ${ownerPills()}
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Realized P&L</span>
+        <span style="font-size:0.7rem;color:var(--muted)">${selectedOwner || 'All owners'}</span>
+      </div>
+      <div class="card-value ${pnlClass}">${pnlSign}${fmt(realized)}</div>
+      <div class="card-sub">${state.transactions.length} transactions · $${TX_COST} fee/tx</div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Owner Breakdown</div>
+      ${ownerRows}
+    </div>
+
+    <div class="section-title" style="margin-bottom:10px">Recent Activity</div>
+    ${recentHTML}
+  `;
+}
+
+// ══════════════════════════════════════════════
+// STOCKS TAB
+// ══════════════════════════════════════════════
+function renderStocks() {
+  const positions = calcStockPositions(selectedOwner);
+  const tickers = Object.keys(positions);
+
+  if (tickers.length === 0) return ownerPills() + '<div class="empty">No stock transactions yet.<br>Go to "+ Add" to add one.</div>';
+
+  const open = tickers.filter(t => positions[t].open);
+  const closed = tickers.filter(t => !positions[t].open);
+
+  const stockCard = (ticker) => {
+    const p = positions[ticker];
+    const pnlClass = p.realizedPnL >= 0 ? 'pos' : 'neg';
+    const sign = p.realizedPnL >= 0 ? '+' : '';
+    return `<div class="stock-item">
+      <div class="stock-top">
+        <span class="stock-name">${ticker} ${p.open ? '<span style="font-size:0.62rem;color:var(--accent);background:rgba(110,231,183,0.1);padding:2px 6px;border-radius:4px;font-weight:700">OPEN</span>' : ''}</span>
+        <span class="stock-pnl ${pnlClass}">${sign}${fmt(p.realizedPnL)}</span>
+      </div>
+      <div class="stock-detail">
+        ${p.open ? `<div class="sdet">Qty Held<span>${p.qty.toFixed(4)}</span></div>
+        <div class="sdet">Avg Cost<span>$${p.avgCost.toFixed(4)}</span></div>
+        <div class="sdet">Cost Basis<span>${fmt(p.totalCost)}</span></div>` :
+        `<div class="sdet">Status<span style="color:var(--muted)">Closed</span></div>
+        <div class="sdet">Realized<span class="${pnlClass}">${sign}${fmt(p.realizedPnL)}</span></div>
+        <div class="sdet">Transactions<span>${p.txCount}</span></div>`}
+      </div>
+    </div>`;
+  };
+
+  return `
+    ${ownerPills()}
+    ${open.length > 0 ? `<div class="section-title">Open Positions (${open.length})</div>${open.map(stockCard).join('')}` : ''}
+    ${closed.length > 0 ? `<div class="section-title" style="margin-top:${open.length?'14px':'0'}">Closed Positions (${closed.length})</div>${closed.map(stockCard).join('')}` : ''}
+  `;
+}
+
+// ══════════════════════════════════════════════
+// TRANSACTIONS TAB
+// ══════════════════════════════════════════════
+function renderTransactions() {
+  const txs = [...state.transactions].sort((a,b) => new Date(b.date)-new Date(a.date));
+
+  if (txs.length === 0) return ownerPills() + '<div class="empty">No transactions yet.</div>';
+
+  const filtered = selectedOwner
+    ? txs.filter(tx => tx.shares && (tx.shares[selectedOwner] || 0) > 0 || tx.type === 'deposit' || tx.type === 'withdraw')
+    : txs;
+
+  return `
+    ${ownerPills()}
+    <div class="action-row">
+      <button class="action-btn" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="action-btn" onclick="clearAll()">🗑 Clear All</button>
+    </div>
+    <div class="section-title">${filtered.length} transactions</div>
+    ${filtered.map(tx => txCard(tx, true)).join('')}
+  `;
+}
+
+function txCard(tx, showDelete = false) {
+  const typeMap = { buy:'BUY', sell:'SELL', deposit:'DEP', withdraw:'WIT' };
+  const badgeClass = { buy:'buy', sell:'sell', deposit:'dep', withdraw:'wit' };
+  const amt = tx.type === 'deposit' || tx.type === 'withdraw'
+    ? tx.amount
+    : tx.qty * tx.price;
+  const netAmt = tx.type === 'buy' ? amt + TX_COST * (tx.txCostCount||1)
+    : tx.type === 'sell' ? amt - TX_COST * (tx.txCostCount||1) : amt;
+  const sign = tx.type === 'sell' || tx.type === 'deposit' ? '+' : '-';
+  const amtClass = tx.type === 'sell' || tx.type === 'deposit' ? 'pos' : tx.type === 'buy' ? 'neg' : 'neu';
+
+  const ownersStr = tx.shares ? state.owners.filter(o => (tx.shares[o]||0)>0).map(o => `${o} ${tx.shares[o]}%`).join(' · ') : '';
+
+  return `<div class="tx-item">
+    <div class="tx-badge ${badgeClass[tx.type]}">${typeMap[tx.type]}</div>
+    <div class="tx-info">
+      <div class="tx-top">
+        <span class="tx-name">${tx.ticker || 'Cash'}</span>
+        <span class="tx-amount ${amtClass}">${sign}${fmt(netAmt)}</span>
+      </div>
+      <div class="tx-meta">${tx.date}${tx.qty ? ` · ${tx.qty} @ $${tx.price}` : ''}${(tx.txCostCount||1)>1?' · '+tx.txCostCount+' fees':' · 1 fee'}</div>
+      ${tx.note ? `<div class="tx-meta" style="color:var(--muted)">${tx.note}</div>` : ''}
+      ${ownersStr ? `<div class="tx-owners">${ownersStr}</div>` : ''}
+    </div>
+    ${showDelete ? `<button class="danger-btn" onclick="deleteTx('${tx.id}')">✕</button>` : ''}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// ADD FORM
+// ══════════════════════════════════════════════
+let formState = {
+  type: 'buy',
+  ticker: '', qty: '', price: '', amount: '',
+  date: new Date().toISOString().slice(0,10),
+  note: '', txCostCount: '1',
+  ownerShares: {} // owner -> pct string
+};
+
+function resetForm() {
+  formState.type = 'buy';
+  formState.ticker = ''; formState.qty = ''; formState.price = ''; formState.amount = '';
+  formState.date = new Date().toISOString().slice(0,10);
+  formState.note = ''; formState.txCostCount = '1';
+  formState.ownerShares = {};
+  state.owners.forEach(o => { formState.ownerShares[o] = ''; });
+}
+
+function renderAddForm() {
+  if (!formState.ownerShares || Object.keys(formState.ownerShares).length === 0) {
+    state.owners.forEach(o => { formState.ownerShares[o] = formState.ownerShares[o] || ''; });
+  }
+
+  const isCash = formState.type === 'deposit' || formState.type === 'withdraw';
+  const pctTotal = state.owners.reduce((s,o) => s + (parseFloat(formState.ownerShares[o])||0), 0);
+  const pctOk = Math.abs(pctTotal - 100) < 0.01;
+
+  return `
+    <div class="form-section">
+      <label class="form-label">Transaction Type</label>
+      <div class="type-btns">
+        <button class="type-btn ${formState.type==='buy'?'active-buy':''}" onclick="setType('buy')">Buy</button>
+        <button class="type-btn ${formState.type==='sell'?'active-sell':''}" onclick="setType('sell')">Sell</button>
+        <button class="type-btn ${formState.type==='deposit'?'active-dep':''}" onclick="setType('deposit')">Deposit</button>
+        <button class="type-btn ${formState.type==='withdraw'?'active-wit':''}" onclick="setType('withdraw')">Withdraw</button>
+      </div>
+    </div>
+
+    ${!isCash ? `
+    <div class="form-section">
+      <label class="form-label">Ticker Symbol</label>
+      <input class="form-input" type="text" placeholder="e.g. RKLB" value="${formState.ticker}"
+        oninput="formState.ticker=this.value.toUpperCase();this.value=formState.ticker" style="text-transform:uppercase" />
+    </div>
+    <div class="form-row form-section">
+      <div>
+        <label class="form-label">Quantity</label>
+        <input class="form-input" type="number" step="any" placeholder="0.00" value="${formState.qty}"
+          oninput="formState.qty=this.value" />
+      </div>
+      <div>
+        <label class="form-label">Price ($)</label>
+        <input class="form-input" type="number" step="any" placeholder="0.00" value="${formState.price}"
+          oninput="formState.price=this.value" />
+      </div>
+    </div>
+    <div class="form-section">
+      <label class="form-label">Number of Partial Transactions (fees)</label>
+      <input class="form-input" type="number" min="1" placeholder="1" value="${formState.txCostCount}"
+        oninput="formState.txCostCount=this.value" />
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:4px">Total fee: $${((parseFloat(formState.txCostCount)||1)*TX_COST).toFixed(2)}</div>
+    </div>
+    ` : `
+    <div class="form-section">
+      <label class="form-label">Amount ($)</label>
+      <input class="form-input" type="number" step="any" placeholder="0.00" value="${formState.amount}"
+        oninput="formState.amount=this.value" />
+    </div>
+    `}
+
+    <div class="form-section">
+      <label class="form-label">Date</label>
+      <input class="form-input" type="date" value="${formState.date}"
+        oninput="formState.date=this.value" />
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">Owner Shares (%)</label>
+      <div class="pct-row">
+        ${state.owners.map(o => `
+          <div class="pct-input-wrap">
+            <span class="pct-label">${o}</span>
+            <input class="pct-input" type="number" min="0" max="100" step="any"
+              placeholder="0" value="${formState.ownerShares[o]||''}"
+              oninput="formState.ownerShares['${o}']=this.value;updatePctTotal()" />
+            <span style="font-size:0.72rem;color:var(--muted)">%</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="pct-total ${pctOk?'pos':pctTotal>0?'neg':'neu'}" id="pct-total">
+        Total: ${pctTotal.toFixed(1)}% ${pctOk?'✓':pctTotal>0?'(must equal 100%)':''}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        ${state.owners.length === 3 ? `
+          <button class="type-btn" onclick="setEqualSplit()" style="flex:none;padding:5px 10px;font-size:0.7rem">Equal Split</button>
+          <button class="type-btn" onclick="setSplit([88.6,8.2,3.2])" style="flex:none;padding:5px 10px;font-size:0.7rem">88.6/8.2/3.2</button>
+        ` : `<button class="type-btn" onclick="setEqualSplit()" style="flex:none;padding:5px 10px;font-size:0.7rem">Equal Split</button>`}
+      </div>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">Note (optional)</label>
+      <input class="form-input" type="text" placeholder="Optional note" value="${formState.note}"
+        oninput="formState.note=this.value" />
+    </div>
+
+    <button class="submit-btn" onclick="submitTransaction()">Add Transaction</button>
+    <button class="type-btn" onclick="resetForm();renderMain()" style="width:100%;margin-top:8px;padding:9px">Reset</button>
+  `;
+}
+
+function setType(t) { formState.type = t; renderMain(); }
+
+function setEqualSplit() {
+  const n = state.owners.length;
+  const pct = (100/n).toFixed(4);
+  state.owners.forEach(o => { formState.ownerShares[o] = pct; });
+  renderMain();
+}
+
+function setSplit(pcts) {
+  state.owners.forEach((o,i) => { formState.ownerShares[o] = String(pcts[i]||0); });
+  renderMain();
+}
+
+function updatePctTotal() {
+  const total = state.owners.reduce((s,o) => s + (parseFloat(formState.ownerShares[o])||0), 0);
+  const el = document.getElementById('pct-total');
+  if (!el) return;
+  const ok = Math.abs(total - 100) < 0.01;
+  el.textContent = `Total: ${total.toFixed(1)}% ${ok?'✓':total>0?'(must equal 100%)':''}`;
+  el.className = `pct-total ${ok?'pos':total>0?'neg':'neu'}`;
+}
+
+function submitTransaction() {
+  const t = formState.type;
+  const isCash = t === 'deposit' || t === 'withdraw';
+
+  // Validate
+  if (!isCash) {
+    if (!formState.ticker.trim()) { toast('Enter a ticker symbol'); return; }
+    if (!formState.qty || parseFloat(formState.qty) <= 0) { toast('Enter quantity'); return; }
+    if (!formState.price || parseFloat(formState.price) <= 0) { toast('Enter price'); return; }
+  } else {
+    if (!formState.amount || parseFloat(formState.amount) <= 0) { toast('Enter amount'); return; }
+  }
+  if (!formState.date) { toast('Enter a date'); return; }
+
+  // Validate shares
+  const total = state.owners.reduce((s,o) => s + (parseFloat(formState.ownerShares[o])||0), 0);
+  if (Math.abs(total - 100) > 0.1) { toast('Owner shares must total 100%'); return; }
+
+  const shares = {};
+  state.owners.forEach(o => { shares[o] = parseFloat(formState.ownerShares[o])||0; });
+
+  const tx = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    type: t,
+    date: formState.date,
+    ticker: isCash ? '' : formState.ticker.trim().toUpperCase(),
+    qty: isCash ? 0 : parseFloat(formState.qty),
+    price: isCash ? 0 : parseFloat(formState.price),
+    amount: isCash ? parseFloat(formState.amount) : 0,
+    txCostCount: isCash ? 0 : (parseInt(formState.txCostCount)||1),
+    note: formState.note.trim(),
+    shares
+  };
+
+  state.transactions.push(tx);
+  saveState();
+  toast('Transaction added ✓');
+  resetForm();
+  renderMain();
+}
+
+function deleteTx(id) {
+  if (!confirm('Delete this transaction?')) return;
+  state.transactions = state.transactions.filter(tx => tx.id !== id);
+  saveState();
+  renderMain();
+}
+
+function clearAll() {
+  if (!confirm('Delete ALL transactions? This cannot be undone.')) return;
+  state.transactions = [];
+  saveState();
+  renderMain();
+}
+
+// ══════════════════════════════════════════════
+// EXPORT CSV
+// ══════════════════════════════════════════════
+function exportCSV() {
+  const rows = [['Date','Type','Ticker','Qty','Price','TxCosts','TotalFee','Amount',...state.owners,'Note']];
+  for (const tx of [...state.transactions].sort((a,b)=>new Date(a.date)-new Date(b.date))) {
+    const gross = tx.qty * tx.price;
+    const fee = TX_COST * (tx.txCostCount||0);
+    const net = tx.type==='buy' ? gross+fee : tx.type==='sell' ? gross-fee : tx.amount;
+    rows.push([
+      tx.date, tx.type, tx.ticker, tx.qty||'', tx.price||'',
+      tx.txCostCount||0, fee, net.toFixed(2),
+      ...state.owners.map(o => (tx.shares?.[o]||0)+'%'),
+      tx.note
+    ]);
+  }
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'portfolio_export.csv';
+  a.click();
+  toast('CSV downloaded ✓');
+}
+
+// ══════════════════════════════════════════════
+// MANAGE OWNERS (settings)
+// ══════════════════════════════════════════════
+function openSettings() {
+  document.getElementById('modal-title').textContent = 'Manage Owners';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="form-section">
+      ${state.owners.map((o,i) => `
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+          <input class="form-input" type="text" value="${o}" oninput="state.owners[${i}]=this.value" style="flex:1" />
+          ${state.owners.length > 1 ? `<button class="danger-btn" onclick="removeOwner(${i})">✕</button>` : ''}
+        </div>
+      `).join('')}
+      <button class="action-btn" onclick="addOwner()" style="width:100%;margin-top:4px">+ Add Owner</button>
+    </div>
+    <button class="submit-btn" onclick="saveOwners()">Save</button>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function addOwner() {
+  state.owners.push('New');
+  openSettings();
+}
+
+function removeOwner(i) {
+  state.owners.splice(i, 1);
+  openSettings();
+}
+
+function saveOwners() {
+  state.owners = state.owners.map(o => o.trim()).filter(Boolean);
+  saveState();
+  closeModal();
+  renderMain();
+  toast('Owners saved ✓');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// ══════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════
+function fmt(n) {
+  const abs = Math.abs(n);
+  const s = abs.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  return (n < 0 ? '-' : '') + '$' + s;
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+loadState();
+resetForm();
+// Pre-fill owner shares from existing owners
+state.owners.forEach(o => { if (!formState.ownerShares[o]) formState.ownerShares[o] = ''; });
+renderMain();
+
+// Add settings icon to header
+document.querySelector('header h1').insertAdjacentHTML('afterend',
+  `<button onclick="openSettings()" style="position:absolute;right:16px;top:14px;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer">⚙</button>`
+);
+document.querySelector('header').style.position = 'relative';
+</script>
+</body>
+</html>
