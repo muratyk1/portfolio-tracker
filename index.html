@@ -820,39 +820,81 @@ function exportCSV(){
   a.download=`portfolio_backup_${new Date().toISOString().slice(0,10)}.csv`;
   a.click(); toast('Exported ✓');
 }
+function parseCSV(text){
+  // Robust CSV parser: handles quoted fields, \r\n and \n line endings, embedded commas/quotes
+  const rows=[];
+  let i=0;
+  while(i<text.length){
+    const row=[];
+    while(i<text.length){
+      if(text[i]==='"'){
+        // Quoted field
+        i++; let val='';
+        while(i<text.length){
+          if(text[i]==='"'&&text[i+1]==='"'){val+='"';i+=2;}
+          else if(text[i]==='"'){i++;break;}
+          else{val+=text[i++];}
+        }
+        row.push(val);
+        if(text[i]===',')i++;
+        else break;
+      } else {
+        // Unquoted field
+        let val='';
+        while(i<text.length&&text[i]!==','&&text[i]!=='\n'&&text[i]!=='\r'){val+=text[i++];}
+        row.push(val.trim());
+        if(text[i]===',')i++;
+        else break;
+      }
+    }
+    // Skip line ending
+    if(text[i]==='\r')i++;
+    if(text[i]==='\n')i++;
+    if(row.length>0&&!(row.length===1&&row[0]===''))rows.push(row);
+  }
+  return rows;
+}
 function importCSV(){
-  const input=document.createElement('input'); input.type='file'; input.accept='.csv';
+  const input=document.createElement('input'); input.type='file'; input.accept='.csv,.txt';
   input.onchange=e=>{
     const file=e.target.files[0]; if(!file)return;
     const reader=new FileReader();
     reader.onload=ev=>{
       try{
-        const lines=ev.target.result.trim().split('\n');
-        const hdrs=lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
-        const g=(row,col)=>(row[hdrs.indexOf(col)]||'').replace(/^"|"$/g,'').trim();
+        const rows=parseCSV(ev.target.result);
+        if(rows.length<2){toast('CSV boş veya hatalı');return;}
+        const hdrs=rows[0].map(h=>h.trim());
+        const gi=(row,col)=>{const idx=hdrs.indexOf(col);return idx>=0?(row[idx]||'').trim():'';};
         const existing=new Set(state.transactions.map(tx=>tx.id));
         let n=0;
-        for(let i=1;i<lines.length;i++){
-          const row=lines[i].match(/("(?:[^"]|"")*"|[^,]*)/g)||[];
-          const type=g(row,'Type');
+        for(let i=1;i<rows.length;i++){
+          const row=rows[i];
+          if(!row||row.length<3) continue;
+          const type=gi(row,'Type').toLowerCase();
           if(!['buy','sell','deposit','withdraw'].includes(type)) continue;
-          const id=g(row,'ID')||Date.now().toString(36)+i;
+          const id=gi(row,'ID')||Date.now().toString(36)+Math.random().toString(36).slice(2,5)+i;
           if(existing.has(id)) continue;
           const shares={};
-          state.owners.forEach(o=>{shares[o]=parseFloat(g(row,o))||0;});
+          state.owners.forEach(o=>{shares[o]=parseFloat(gi(row,o))||0;});
+          // If no owner columns found, try to detect from headers
+          const totalShares=Object.values(shares).reduce((s,v)=>s+v,0);
+          if(totalShares===0){
+            // Try to give 100% to first owner as fallback
+            if(state.owners.length>0) shares[state.owners[0]]=100;
+          }
           state.transactions.push({
-            id,type,date:g(row,'Date'),
-            ticker:g(row,'Ticker'),
-            qty:parseFloat(g(row,'Qty'))||0,
-            price:parseFloat(g(row,'Price'))||0,
-            amount:parseFloat(g(row,'Amount'))||0,
-            note:g(row,'Note'),shares
+            id,type,date:gi(row,'Date'),
+            ticker:gi(row,'Ticker').toUpperCase(),
+            qty:parseFloat(gi(row,'Qty'))||0,
+            price:parseFloat(gi(row,'Price'))||0,
+            amount:parseFloat(gi(row,'Amount'))||0,
+            note:gi(row,'Note'),shares
           }); n++;
         }
-        saveState(); renderMain(); toast(`Imported ${n} transactions ✓`);
+        saveState(); renderMain(); toast('Imported '+n+' transactions ✓');
       }catch(err){toast('Import error: '+err.message);}
     };
-    reader.readAsText(file);
+    reader.readAsText(file,'UTF-8');
   };
   input.click();
 }
