@@ -6,279 +6,120 @@
 <title>Portfolio Tracker</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap');
-
-  /* ── DARK THEME (default) ── */
   :root {
-    --bg: #0a0a0f;
-    --surface: #111118;
-    --surface2: #1a1a24;
-    --border: #2a2a3a;
-    --accent: #6ee7b7;
-    --accent2: #f59e0b;
-    --red: #f87171;
-    --green: #6ee7b7;
-    --text: #e8e8f0;
-    --muted: #6b7080;
-    --radius: 12px;
-    --header-bg: rgba(10,10,15,0.92);
-    --table-header-bg: #1a1a24;
-    --table-row-alt: #0f0f16;
+    --bg:#0a0a0f;--surface:#111118;--surface2:#1a1a24;--border:#2a2a3a;
+    --accent:#6ee7b7;--accent2:#f59e0b;--red:#f87171;--green:#6ee7b7;
+    --text:#e8e8f0;--muted:#6b7080;--radius:12px;
+    --header-bg:rgba(10,10,15,0.92);--table-header-bg:#1a1a24;--table-row-alt:#0f0f16;
   }
-
-  /* ── LIGHT THEME ── */
   body.light {
-    --bg: #f4f6f9;
-    --surface: #ffffff;
-    --surface2: #eef1f6;
-    --border: #d0d7e3;
-    --accent: #059669;
-    --accent2: #d97706;
-    --red: #dc2626;
-    --green: #059669;
-    --text: #1a202c;
-    --muted: #6b7280;
-    --radius: 12px;
-    --header-bg: rgba(244,246,249,0.95);
-    --table-header-bg: #e8ecf3;
-    --table-row-alt: #f8fafc;
+    --bg:#f4f6f9;--surface:#ffffff;--surface2:#eef1f6;--border:#d0d7e3;
+    --accent:#059669;--accent2:#d97706;--red:#dc2626;--green:#059669;
+    --text:#1a202c;--muted:#6b7280;--header-bg:rgba(244,246,249,0.95);
+    --table-header-bg:#e8ecf3;--table-row-alt:#f8fafc;
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Roboto', sans-serif;
-    min-height: 100dvh;
-    overscroll-behavior: none;
-    transition: background 0.2s, color 0.2s;
-  }
-
-  #app { display: flex; flex-direction: column; min-height: 100dvh; }
-
-  header {
-    position: sticky; top: 0; z-index: 100;
-    background: var(--header-bg);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 16px 10px;
-    position: relative;
-  }
-  header h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.01em; }
-  header h1 span { color: var(--accent); }
-
-  .header-actions { position: absolute; right: 16px; top: 12px; display: flex; gap: 8px; align-items: center; }
-  .icon-btn { background: none; border: none; color: var(--muted); font-size: 1.1rem; cursor: pointer; padding: 4px; line-height: 1; }
-  .theme-toggle { font-size: 1rem; }
-
-  .nav-tabs {
-    display: flex; gap: 4px; margin-top: 10px;
-    background: var(--surface2); border-radius: 8px; padding: 3px;
-  }
-  .nav-tab {
-    flex: 1; padding: 6px 4px; border: none; background: transparent;
-    color: var(--muted); font-family: 'Roboto', sans-serif;
-    font-size: 0.7rem; font-weight: 500; border-radius: 6px;
-    cursor: pointer; transition: all 0.15s; white-space: nowrap;
-  }
-  .nav-tab.active { background: var(--surface); color: var(--accent); font-weight: 700; box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
-
-  main { flex: 1; padding: 16px; }
-
-  /* ── OWNER PILLS ── */
-  .owner-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
-  .pill {
-    padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border);
-    background: var(--surface); color: var(--muted);
-    font-size: 0.78rem; font-weight: 500; cursor: pointer;
-    transition: all 0.15s; font-family: 'Roboto', sans-serif;
-  }
-  .pill.active { border-color: var(--accent); color: var(--accent); background: rgba(110,231,183,0.08); font-weight: 700; }
-  body.light .pill.active { background: rgba(5,150,105,0.08); }
-
-  /* ── CARDS ── */
-  .card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 14px; margin-bottom: 12px;
-  }
-
-  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-  .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
-  .stat-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
-  .stat-val { font-size: 1.1rem; font-weight: 700; font-family: 'Roboto Mono', monospace; }
-
-  /* ── COLORS ── */
-  .pos { color: var(--green); }
-  .neg { color: var(--red); }
-  .neu { color: var(--text); }
-
-  /* ── OWNER TABLE ── */
-  .owner-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
-  .owner-table th {
-    background: var(--table-header-bg); color: var(--muted);
-    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em;
-    text-transform: uppercase; padding: 8px 10px; text-align: right;
-    border-bottom: 2px solid var(--border);
-  }
-  .owner-table th:first-child { text-align: left; border-radius: 8px 0 0 0; }
-  .owner-table th:last-child { border-radius: 0 8px 0 0; }
-  .owner-table td {
-    padding: 9px 10px; text-align: right; border-bottom: 1px solid var(--border);
-    font-family: 'Roboto Mono', monospace; font-size: 0.82rem; font-weight: 500;
-  }
-  .owner-table td:first-child { text-align: left; font-family: 'Roboto', sans-serif; font-weight: 600; font-size: 0.85rem; }
-  .owner-table tr:last-child td { border-bottom: none; }
-  .owner-table tr:nth-child(even) td { background: var(--table-row-alt); }
-  .owner-table .total-row td { font-weight: 700; border-top: 2px solid var(--border); background: var(--table-header-bg) !important; }
-
-  /* ── STOCK CARDS ── */
-  .stock-item {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; transition: border-color 0.15s;
-  }
-  .stock-item:active { border-color: var(--accent); }
-  .stock-top { display: flex; justify-content: space-between; align-items: center; }
-  .stock-name { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.03em; }
-  .stock-pnl { font-size: 1rem; font-weight: 700; font-family: 'Roboto Mono', monospace; }
-  .stock-detail { margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
-  .sdet { font-size: 0.68rem; color: var(--muted); }
-  .sdet span { display: block; color: var(--text); font-family: 'Roboto Mono', monospace; font-size: 0.78rem; font-weight: 500; }
-
-  /* ── TRANSACTIONS ── */
-  .tx-item {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 11px 14px; margin-bottom: 8px;
-    display: flex; align-items: flex-start; gap: 12px;
-  }
-  .tx-badge {
-    min-width: 36px; height: 36px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; flex-shrink: 0;
-  }
-  .tx-badge.buy { background: rgba(110,231,183,0.12); color: var(--green); }
-  .tx-badge.sell { background: rgba(248,113,113,0.12); color: var(--red); }
-  .tx-badge.dep { background: rgba(245,158,11,0.12); color: var(--accent2); }
-  .tx-badge.wit { background: rgba(107,112,128,0.15); color: var(--muted); }
-  body.light .tx-badge.buy { background: rgba(5,150,105,0.1); }
-  .tx-info { flex: 1; min-width: 0; }
-  .tx-top { display: flex; justify-content: space-between; align-items: baseline; }
-  .tx-name { font-size: 0.88rem; font-weight: 700; }
-  .tx-amount { font-size: 0.88rem; font-weight: 700; font-family: 'Roboto Mono', monospace; }
-  .tx-meta { font-size: 0.7rem; color: var(--muted); margin-top: 2px; font-family: 'Roboto Mono', monospace; }
-  .tx-owners { font-size: 0.67rem; color: var(--muted); margin-top: 3px; }
-
-  /* ── FORM ── */
-  .form-section { margin-bottom: 14px; }
-  .form-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; display: block; }
-  .form-input {
-    width: 100%; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 12px; color: var(--text);
-    font-family: 'Roboto Mono', monospace; font-size: 0.88rem;
-    outline: none; transition: border-color 0.15s; -webkit-appearance: none;
-  }
-  .form-input:focus { border-color: var(--accent); }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .type-btns { display: flex; gap: 6px; }
-  .type-btn {
-    flex: 1; padding: 9px 6px; border-radius: 8px; border: 1px solid var(--border);
-    background: var(--surface); color: var(--muted);
-    font-family: 'Roboto', sans-serif; font-size: 0.75rem; font-weight: 500;
-    cursor: pointer; transition: all 0.15s; text-align: center;
-  }
-  .type-btn.active-buy { border-color: var(--green); color: var(--green); background: rgba(110,231,183,0.08); font-weight: 700; }
-  .type-btn.active-sell { border-color: var(--red); color: var(--red); background: rgba(248,113,113,0.08); font-weight: 700; }
-  .type-btn.active-dep { border-color: var(--accent2); color: var(--accent2); background: rgba(245,158,11,0.08); font-weight: 700; }
-  .type-btn.active-wit { border-color: var(--muted); color: var(--text); background: rgba(107,112,128,0.1); font-weight: 700; }
-  body.light .type-btn.active-buy { background: rgba(5,150,105,0.08); }
-
-  .pct-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-  .pct-input-wrap { display: flex; align-items: center; gap: 4px; }
-  .pct-label { font-size: 0.72rem; color: var(--accent); font-weight: 600; min-width: 48px; font-family: 'Roboto', sans-serif; }
-  .pct-input {
-    width: 64px; background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 6px; padding: 5px 8px; color: var(--text);
-    font-family: 'Roboto Mono', monospace; font-size: 0.82rem;
-    outline: none; -webkit-appearance: none; text-align: right;
-  }
-  .pct-input:focus { border-color: var(--accent); }
-  .pct-total { font-size: 0.72rem; font-family: 'Roboto Mono', monospace; margin-top: 6px; }
-
-  .submit-btn {
-    width: 100%; padding: 13px; border: none; border-radius: 10px;
-    background: var(--accent); color: #0a0a0f;
-    font-family: 'Roboto', sans-serif; font-size: 0.9rem; font-weight: 700;
-    cursor: pointer; transition: opacity 0.15s; letter-spacing: 0.02em; margin-top: 6px;
-  }
-  body.light .submit-btn { color: #fff; }
-  .submit-btn:active { opacity: 0.8; }
-
-  .danger-btn {
-    padding: 6px 12px; border: 1px solid rgba(248,113,113,0.3); border-radius: 7px;
-    background: transparent; color: var(--red);
-    font-family: 'Roboto', sans-serif; font-size: 0.7rem; font-weight: 500; cursor: pointer;
-  }
-
-  .empty { text-align: center; color: var(--muted); padding: 40px 16px; font-size: 0.85rem; }
-
-  /* ── TOAST ── */
-  .toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 10px 18px; font-size: 0.82rem; font-weight: 500;
-    opacity: 0; transition: all 0.25s; z-index: 999; white-space: nowrap; pointer-events: none;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* ── MODAL ── */
-  .modal-overlay {
-    display: none; position: fixed; inset: 0; z-index: 200;
-    background: rgba(0,0,10,0.75); backdrop-filter: blur(4px);
-    padding: 24px 16px; overflow-y: auto;
-  }
-  body.light .modal-overlay { background: rgba(0,0,0,0.4); }
-  .modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
-  .modal {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 20px; width: 100%; max-width: 480px; margin: auto;
-  }
-  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-  .modal-title { font-size: 1rem; font-weight: 700; }
-  .close-btn { background: none; border: none; color: var(--muted); font-size: 1.3rem; cursor: pointer; padding: 4px; }
-
-  select.form-input { cursor: pointer; }
-  option { background: var(--surface2); }
-
-  .section-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
-
-  .action-row { display: flex; gap: 8px; margin-bottom: 16px; }
-  .action-btn {
-    flex: 1; padding: 9px; border: 1px solid var(--border); border-radius: 8px;
-    background: var(--surface); color: var(--text);
-    font-family: 'Roboto', sans-serif; font-size: 0.75rem; font-weight: 500;
-    cursor: pointer; text-align: center;
-  }
-  .action-btn:active { border-color: var(--accent); color: var(--accent); }
-
-  /* ── SETTINGS ROWS ── */
-  .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
-  .setting-row:last-child { border-bottom: none; }
-  .setting-label { font-size: 0.88rem; font-weight: 500; }
-  .setting-sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
-
-  /* Toggle switch */
-  .toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
-  .toggle input { opacity: 0; width: 0; height: 0; }
-  .toggle-slider {
-    position: absolute; inset: 0; border-radius: 24px;
-    background: var(--border); cursor: pointer; transition: 0.2s;
-  }
-  .toggle-slider:before {
-    content: ''; position: absolute; width: 18px; height: 18px;
-    left: 3px; top: 3px; border-radius: 50%; background: white; transition: 0.2s;
-  }
-  input:checked + .toggle-slider { background: var(--accent); }
-  input:checked + .toggle-slider:before { transform: translateX(20px); }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Roboto',sans-serif;min-height:100dvh;overscroll-behavior:none;transition:background .2s,color .2s;}
+  #app{display:flex;flex-direction:column;min-height:100dvh;}
+  header{position:sticky;top:0;z-index:100;background:var(--header-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 16px 10px;position:relative;}
+  header h1{font-size:1.15rem;font-weight:700;}
+  header h1 span{color:var(--accent);}
+  .header-actions{position:absolute;right:16px;top:12px;display:flex;gap:8px;align-items:center;}
+  .icon-btn{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:4px;line-height:1;}
+  .nav-tabs{display:flex;gap:4px;margin-top:10px;background:var(--surface2);border-radius:8px;padding:3px;}
+  .nav-tab{flex:1;padding:6px 4px;border:none;background:transparent;color:var(--muted);font-family:'Roboto',sans-serif;font-size:0.7rem;font-weight:500;border-radius:6px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+  .nav-tab.active{background:var(--surface);color:var(--accent);font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.12);}
+  main{flex:1;padding:16px;}
+  .owner-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+  .pill{padding:5px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:.78rem;font-weight:500;cursor:pointer;transition:all .15s;font-family:'Roboto',sans-serif;}
+  .pill.active{border-color:var(--accent);color:var(--accent);background:rgba(110,231,183,.08);font-weight:700;}
+  body.light .pill.active{background:rgba(5,150,105,.08);}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px;}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+  .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;}
+  .stat-label{font-size:.68rem;font-weight:700;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
+  .stat-val{font-size:1.05rem;font-weight:700;font-family:'Roboto Mono',monospace;}
+  .stat-sub{font-size:.7rem;color:var(--muted);margin-top:2px;font-family:'Roboto Mono',monospace;}
+  .pos{color:var(--green);} .neg{color:var(--red);} .neu{color:var(--text);}
+  .owner-table{width:100%;border-collapse:collapse;font-size:.83rem;}
+  .owner-table th{background:var(--table-header-bg);color:var(--muted);font-size:.63rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:8px 6px;text-align:right;border-bottom:2px solid var(--border);}
+  .owner-table th:first-child{text-align:left;}
+  .owner-table td{padding:8px 6px;text-align:right;border-bottom:1px solid var(--border);font-family:'Roboto Mono',monospace;font-size:.76rem;font-weight:500;}
+  .owner-table td:first-child{text-align:left;font-family:'Roboto',sans-serif;font-weight:600;font-size:.82rem;}
+  .owner-table tr:last-child td{border-bottom:none;}
+  .owner-table tr:nth-child(even) td{background:var(--table-row-alt);}
+  .owner-table .total-row td{font-weight:700;border-top:2px solid var(--border);background:var(--table-header-bg)!important;}
+  .stock-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;transition:border-color .15s;}
+  .stock-top{display:flex;justify-content:space-between;align-items:center;}
+  .stock-name{font-size:.95rem;font-weight:700;letter-spacing:.03em;}
+  .stock-pnl{font-size:1rem;font-weight:700;font-family:'Roboto Mono',monospace;}
+  .stock-detail{margin-top:8px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+  .sdet{font-size:.68rem;color:var(--muted);}
+  .sdet span{display:block;color:var(--text);font-family:'Roboto Mono',monospace;font-size:.76rem;font-weight:500;}
+  .tx-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;}
+  .tx-badge{min-width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;letter-spacing:.04em;flex-shrink:0;}
+  .tx-badge.buy{background:rgba(110,231,183,.12);color:var(--green);}
+  .tx-badge.sell{background:rgba(248,113,113,.12);color:var(--red);}
+  .tx-badge.dep{background:rgba(245,158,11,.12);color:var(--accent2);}
+  .tx-badge.wit{background:rgba(107,112,128,.15);color:var(--muted);}
+  body.light .tx-badge.buy{background:rgba(5,150,105,.1);}
+  .tx-info{flex:1;min-width:0;}
+  .tx-top{display:flex;justify-content:space-between;align-items:baseline;}
+  .tx-name{font-size:.88rem;font-weight:700;}
+  .tx-amount{font-size:.88rem;font-weight:700;font-family:'Roboto Mono',monospace;}
+  .tx-meta{font-size:.7rem;color:var(--muted);margin-top:2px;font-family:'Roboto Mono',monospace;}
+  .tx-owners{font-size:.67rem;color:var(--muted);margin-top:3px;}
+  .form-section{margin-bottom:14px;}
+  .form-label{font-size:.72rem;font-weight:700;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;display:block;}
+  .form-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'Roboto Mono',monospace;font-size:.88rem;outline:none;transition:border-color .15s;-webkit-appearance:none;}
+  .form-input:focus{border-color:var(--accent);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .type-btns{display:flex;gap:6px;}
+  .type-btn{flex:1;padding:9px 6px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:'Roboto',sans-serif;font-size:.75rem;font-weight:500;cursor:pointer;transition:all .15s;text-align:center;}
+  .type-btn.active-buy{border-color:var(--green);color:var(--green);background:rgba(110,231,183,.08);font-weight:700;}
+  .type-btn.active-sell{border-color:var(--red);color:var(--red);background:rgba(248,113,113,.08);font-weight:700;}
+  .type-btn.active-dep{border-color:var(--accent2);color:var(--accent2);background:rgba(245,158,11,.08);font-weight:700;}
+  .type-btn.active-wit{border-color:var(--muted);color:var(--text);background:rgba(107,112,128,.1);font-weight:700;}
+  body.light .type-btn.active-buy{background:rgba(5,150,105,.08);}
+  .pct-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .pct-input-wrap{display:flex;align-items:center;gap:4px;}
+  .pct-label{font-size:.72rem;color:var(--accent);font-weight:600;min-width:52px;font-family:'Roboto',sans-serif;}
+  .pct-input{width:68px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-family:'Roboto Mono',monospace;font-size:.82rem;outline:none;-webkit-appearance:none;text-align:right;}
+  .pct-input:focus{border-color:var(--accent);}
+  .pct-total{font-size:.72rem;font-family:'Roboto Mono',monospace;margin-top:6px;}
+  .submit-btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--accent);color:#0a0a0f;font-family:'Roboto',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:opacity .15s;margin-top:6px;}
+  body.light .submit-btn{color:#fff;}
+  .submit-btn:active{opacity:.8;}
+  .danger-btn{padding:6px 12px;border:1px solid rgba(248,113,113,.3);border-radius:7px;background:transparent;color:var(--red);font-family:'Roboto',sans-serif;font-size:.7rem;font-weight:500;cursor:pointer;}
+  .empty{text-align:center;color:var(--muted);padding:40px 16px;font-size:.85rem;}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:.82rem;font-weight:500;opacity:0;transition:all .25s;z-index:999;white-space:nowrap;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,10,.75);backdrop-filter:blur(4px);padding:24px 16px;overflow-y:auto;}
+  body.light .modal-overlay{background:rgba(0,0,0,.4);}
+  .modal-overlay.open{display:flex;align-items:flex-start;justify-content:center;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;width:100%;max-width:480px;margin:auto;}
+  .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+  .modal-title{font-size:1rem;font-weight:700;}
+  .close-btn{background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:4px;}
+  select.form-input{cursor:pointer;}
+  option{background:var(--surface2);}
+  .section-title{font-size:.72rem;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
+  .action-row{display:flex;gap:8px;margin-bottom:16px;}
+  .action-btn{flex:1;padding:9px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-family:'Roboto',sans-serif;font-size:.72rem;font-weight:500;cursor:pointer;text-align:center;}
+  .action-btn:active{border-color:var(--accent);color:var(--accent);}
+  .setting-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+  .setting-row:last-child{border-bottom:none;}
+  .setting-label{font-size:.88rem;font-weight:500;}
+  .setting-sub{font-size:.72rem;color:var(--muted);margin-top:1px;}
+  .toggle{position:relative;width:44px;height:24px;flex-shrink:0;}
+  .toggle input{opacity:0;width:0;height:0;}
+  .toggle-slider{position:absolute;inset:0;border-radius:24px;background:var(--border);cursor:pointer;transition:.2s;}
+  .toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:white;transition:.2s;}
+  input:checked+.toggle-slider{background:var(--accent);}
+  input:checked+.toggle-slider:before{transform:translateX(20px);}
+  .info-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.78rem;color:var(--muted);margin-top:6px;line-height:1.6;}
+  .wit-price-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:.82rem;}
+  .wit-price-row:last-child{border-bottom:none;}
 </style>
 </head>
 <body>
@@ -286,8 +127,8 @@
   <header>
     <h1>Portfolio <span>Tracker</span></h1>
     <div class="header-actions">
-      <button class="icon-btn theme-toggle" onclick="toggleTheme()" title="Toggle theme" id="theme-btn">☀️</button>
-      <button class="icon-btn" onclick="openSettings()" title="Settings">⚙</button>
+      <button class="icon-btn" onclick="toggleTheme()" id="theme-btn">☀️</button>
+      <button class="icon-btn" onclick="openSettings()">⚙</button>
     </div>
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="showTab('overview')">Overview</button>
@@ -298,7 +139,6 @@
   </header>
   <main id="main-content"></main>
 </div>
-
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
     <div class="modal-header">
@@ -308,452 +148,425 @@
     <div id="modal-body"></div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// STATE  — STORAGE KEY STAYS portfolio_v3 FOREVER
+// ═══════════════════════════════════════════════
 const STORAGE_KEY = 'portfolio_v3';
 const TX_COST = 1.5;
 
-let state = {
-  owners: ['Murat', 'Yusuf', 'Cüneyt'],
-  transactions: [],
-  theme: 'dark'
-};
+let state = { owners:['Murat','Yusuf','Cüneyt'], transactions:[], theme:'dark' };
 
-function loadState() {
+function loadState(){
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) state = { ...state, ...JSON.parse(raw) };
-    if (!state.owners) state.owners = ['Murat', 'Yusuf', 'Cüneyt'];
-    if (!state.transactions) state.transactions = [];
-    if (!state.theme) state.theme = 'dark';
-  } catch(e) {}
+    if(raw) state = { ...state, ...JSON.parse(raw) };
+    if(!state.owners) state.owners=['Murat','Yusuf','Cüneyt'];
+    if(!state.transactions) state.transactions=[];
+    if(!state.theme) state.theme='dark';
+  } catch(e){}
   applyTheme();
 }
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function applyTheme(){
+  const light = state.theme==='light';
+  document.body.classList.toggle('light', light);
+  document.getElementById('theme-btn').textContent = light ? '🌙' : '☀️';
+}
+function toggleTheme(){ state.theme = state.theme==='dark'?'light':'dark'; saveState(); applyTheme(); }
 
-function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+// ═══════════════════════════════════════════════
+// SORTED TRANSACTIONS (insertion-order tiebreaker)
+// ═══════════════════════════════════════════════
+function getSortedTxs(txList){
+  const indexMap = new Map(state.transactions.map((tx,i)=>[tx.id,i]));
+  return [...txList].sort((a,b)=>{
+    const d = new Date(a.date)-new Date(b.date);
+    if(d!==0) return d;
+    return (indexMap.get(a.id)??0)-(indexMap.get(b.id)??0);
+  });
+}
 
-function applyTheme() {
-  if (state.theme === 'light') {
-    document.body.classList.add('light');
-    document.getElementById('theme-btn').textContent = '🌙';
-  } else {
-    document.body.classList.remove('light');
-    document.getElementById('theme-btn').textContent = '☀️';
+// ═══════════════════════════════════════════════
+// PER-OWNER BALANCE (cash + open cost at cost basis)
+// ═══════════════════════════════════════════════
+function calcOwnerBalance(ownerName, txSubset){
+  const txs = getSortedTxs(txSubset !== undefined ? txSubset : state.transactions);
+  let cash=0, deposits=0, withdrawals=0;
+  const positions={};
+  for(const tx of txs){
+    const frac = tx.shares ? (tx.shares[ownerName]||0)/100 : 0;
+    if(tx.type==='deposit'){ const a=tx.amount*frac; cash+=a; deposits+=a; }
+    else if(tx.type==='withdraw'){ const a=tx.amount*frac; cash-=a; withdrawals+=a; }
+    else if(tx.type==='buy'){
+      const cost=(tx.qty*tx.price+TX_COST)*frac;
+      cash-=cost;
+      if(!positions[tx.ticker]) positions[tx.ticker]=[];
+      positions[tx.ticker].push({qty:tx.qty*frac, unitCost:frac>0?cost/(tx.qty*frac):0});
+    } else if(tx.type==='sell'){
+      cash+=(tx.qty*tx.price-TX_COST)*frac;
+      if(positions[tx.ticker]){
+        let rem=tx.qty*frac;
+        while(rem>1e-10 && positions[tx.ticker].length>0){
+          const lot=positions[tx.ticker][0];
+          const use=Math.min(rem,lot.qty);
+          rem-=use; lot.qty-=use;
+          if(lot.qty<1e-10) positions[tx.ticker].shift();
+        }
+      }
+    }
   }
+  const openCost = Object.values(positions).flat().reduce((s,l)=>s+l.qty*l.unitCost,0);
+  return { cash, deposits, withdrawals, openCost };
 }
 
-function toggleTheme() {
-  state.theme = state.theme === 'dark' ? 'light' : 'dark';
-  saveState();
-  applyTheme();
+// Balance at a point in time (for proportional split)
+function calcOwnerBalanceAtPoint(ownerName, beforeIndex){
+  const indexMap = new Map(state.transactions.map((tx,i)=>[tx.id,i]));
+  const subset = state.transactions.filter(tx=>(indexMap.get(tx.id)??0)<beforeIndex);
+  return calcOwnerBalance(ownerName, subset);
 }
 
-// ══════════════════════════════════════════════
-// CALCULATIONS
-// ══════════════════════════════════════════════
-
-// ── CORE ENGINE ──────────────────────────────────────────────────────────────
-// Single source of truth for all calculations.
-// The $1.50 fee is a flat cost per transaction, shared proportionally.
-// For an owner with fraction F of a transaction:
-//   Buy:  owner pays  (qty * price + 1.50) * F
-//   Sell: owner gets  (qty * price - 1.50) * F
-// This keeps cash-flow and P&L perfectly consistent.
-// ─────────────────────────────────────────────────────────────────────────────
-
-// Replay all (or filtered) transactions and return per-owner state.
-// ownerFilter: string → only that owner's proportional slice
-//              null   → aggregate full-portfolio view (fractions sum to whole)
-// upToDate:    ISO date string → only include txs strictly before this date (date filter)
-//              null            → include all txs
-// beforeIndex: number → only include txs with insertion index < beforeIndex (index filter)
-//              null   → no index filter
-// When both are set, a tx is included only if it passes BOTH filters.
-function _replayTxs(ownerFilter, upToDate, beforeIndex) {
-  // Use original array index as tiebreaker so same-day transactions
-  // are always processed in the order you entered them.
-  const indexMap = new Map(state.transactions.map((tx, i) => [tx.id, i]));
-
-  const txs = [...state.transactions]
-    .filter(tx => {
-      if (upToDate && new Date(tx.date) >= new Date(upToDate)) return false;
-      if (beforeIndex != null && (indexMap.get(tx.id) ?? 0) >= beforeIndex) return false;
-      return true;
-    })
-    .sort((a, b) => {
-      const dateDiff = new Date(a.date) - new Date(b.date);
-      if (dateDiff !== 0) return dateDiff;
-      return (indexMap.get(a.id) ?? 0) - (indexMap.get(b.id) ?? 0);
-    });
-
-  let cash = 0, deposits = 0, withdrawals = 0;
-  // positions[ticker] = array of FIFO lots { qty, unitCost }
+// ═══════════════════════════════════════════════
+// STOCK POSITIONS (FIFO, per owner or full portfolio)
+// ═══════════════════════════════════════════════
+// KEY FIX (Madde 1): P&L on sell is distributed to owners who held the
+// matched BUY lots, in THEIR buy-time fractions — not the sell-time fractions.
+function calcPortfolioPositions(){
+  const txs = getSortedTxs(state.transactions);
+  // positions[ticker] = array of lots
+  // Each lot: { qty, unitCost, lotFracs:{owner->frac} }
   const positions = {};
-  // realized P&L per ticker
+  // realized[owner][ticker] = cumulative P&L
   const realized = {};
+  state.owners.forEach(o=>{ realized[o]={}; });
 
-  for (const tx of txs) {
-    // fraction: how much of this transaction belongs to the view we're calculating
-    const frac = ownerFilter
-      ? (tx.shares ? (tx.shares[ownerFilter] || 0) / 100 : 0)
-      : 1; // full transaction for portfolio view
+  for(const tx of txs){
+    if(tx.type==='deposit'||tx.type==='withdraw') continue;
+    if(!positions[tx.ticker]) positions[tx.ticker]=[];
 
-    if (frac === 0) continue;
+    const txFracs = {};
+    state.owners.forEach(o=>{ txFracs[o]=(tx.shares?tx.shares[o]||0:0)/100; });
 
-    if (tx.type === 'deposit') {
-      const amt = tx.amount * frac;
-      cash += amt; deposits += amt;
-
-    } else if (tx.type === 'withdraw') {
-      const amt = tx.amount * frac;
-      cash -= amt; withdrawals += amt;
-
-    } else if (tx.type === 'buy') {
-      // Total cost = (gross + fee) * fraction
-      const gross = tx.qty * tx.price;
-      const totalCost = (gross + TX_COST) * frac;
-      const qty = tx.qty * frac;
-      cash -= totalCost;
-      if (!positions[tx.ticker]) positions[tx.ticker] = [];
-      positions[tx.ticker].push({ qty, unitCost: qty > 0 ? totalCost / qty : 0 });
-      if (!realized[tx.ticker]) realized[tx.ticker] = 0;
-
-    } else if (tx.type === 'sell') {
-      // Revenue = (gross - fee) * fraction
-      const gross = tx.qty * tx.price;
-      const revenue = (gross - TX_COST) * frac;
-      const sellQty = tx.qty * frac;
-      cash += revenue;
-
-      // FIFO: match sell qty against buy lots to compute realized P&L
-      if (!realized[tx.ticker]) realized[tx.ticker] = 0;
-      if (!positions[tx.ticker]) positions[tx.ticker] = [];
-      let rem = sellQty, costBasis = 0;
-      while (rem > 0.00000001 && positions[tx.ticker].length > 0) {
+    if(tx.type==='buy'){
+      const totalCost = tx.qty*tx.price+TX_COST;
+      positions[tx.ticker].push({
+        qty: tx.qty,
+        unitCost: totalCost/tx.qty,
+        lotFracs: {...txFracs}  // buy-time owner fractions
+      });
+    } else if(tx.type==='sell'){
+      const totalRevenue = tx.qty*tx.price-TX_COST;
+      // Sell fracs for revenue distribution
+      const sellFracs = txFracs;
+      let rem = tx.qty;
+      while(rem>1e-10 && positions[tx.ticker].length>0){
         const lot = positions[tx.ticker][0];
         const use = Math.min(rem, lot.qty);
-        costBasis += use * lot.unitCost;
-        lot.qty -= use; rem -= use;
-        if (lot.qty < 0.00000001) positions[tx.ticker].shift();
+        const lotFrac = use/tx.qty; // fraction of total sell qty this lot covers
+        const revenueSlice = totalRevenue*lotFrac; // revenue attributable to this lot
+
+        // For each owner: P&L = (their sell revenue share) - (their cost basis share)
+        // Revenue is distributed by SELL fractions
+        // Cost basis is from BUY fractions of this lot
+        state.owners.forEach(o=>{
+          const ownerRevenue  = revenueSlice*(sellFracs[o]||0);
+          const ownerCostBasis = use*lot.unitCost*(lot.lotFracs[o]||0);
+          if(!realized[o][tx.ticker]) realized[o][tx.ticker]=0;
+          realized[o][tx.ticker] += ownerRevenue - ownerCostBasis;
+        });
+
+        lot.qty-=use; rem-=use;
+        if(lot.qty<1e-10) positions[tx.ticker].shift();
       }
-      realized[tx.ticker] += revenue - costBasis;
     }
   }
 
-  // Summarise open positions
+  // Build open position summaries
   const openPositions = {};
-  for (const [ticker, lots] of Object.entries(positions)) {
-    const qty = lots.reduce((s, l) => s + l.qty, 0);
-    const totalCost = lots.reduce((s, l) => s + l.qty * l.unitCost, 0);
-    if (qty > 0.00000001) {
-      openPositions[ticker] = { qty, avgCost: qty > 0 ? totalCost / qty : 0, totalCost };
-    }
+  for(const [ticker, lots] of Object.entries(positions)){
+    const qty = lots.reduce((s,l)=>s+l.qty,0);
+    if(qty<1e-10) continue;
+    const totalCost = lots.reduce((s,l)=>s+l.qty*l.unitCost,0);
+    // Per-owner cost in open positions
+    const ownerCosts = {};
+    state.owners.forEach(o=>{ ownerCosts[o]=0; });
+    lots.forEach(lot=>{
+      state.owners.forEach(o=>{
+        ownerCosts[o] += lot.qty*lot.unitCost*(lot.lotFracs[o]||0);
+      });
+    });
+    openPositions[ticker]={ qty, avgCost:totalCost/qty, totalCost, ownerCosts };
   }
 
-  const openCost = Object.values(openPositions).reduce((s, p) => s + p.totalCost, 0);
-
-  return { cash, deposits, withdrawals, openCost, openPositions, realized };
+  return { realized, openPositions };
 }
 
-// Public helpers used by the UI
-function calcStockPositions(ownerFilter) {
-  const { realized, openPositions } = _replayTxs(ownerFilter, null);
-
+// For stocks tab view (owner-filtered or full)
+function calcStockPositionsForView(ownerFilter){
+  const { realized, openPositions } = calcPortfolioPositions();
+  const allTickers = new Set([
+    ...Object.values(realized).flatMap(r=>Object.keys(r)),
+    ...Object.keys(openPositions)
+  ]);
   const result = {};
-  const allTickers = new Set([...Object.keys(realized), ...Object.keys(openPositions)]);
-  for (const ticker of allTickers) {
+  for(const ticker of allTickers){
+    let pnl=0;
+    if(ownerFilter){
+      pnl = realized[ownerFilter]?.[ticker]||0;
+    } else {
+      state.owners.forEach(o=>{ pnl+=(realized[o]?.[ticker]||0); });
+    }
     const open = openPositions[ticker];
-    result[ticker] = {
-      qty:         open ? open.qty     : 0,
-      avgCost:     open ? open.avgCost : 0,
-      totalCost:   open ? open.totalCost : 0,
-      realizedPnL: realized[ticker] || 0,
-      open:        !!open,
-      txCount:     state.transactions.filter(tx =>
-                     tx.ticker === ticker &&
-                     (tx.type === 'buy' || tx.type === 'sell')).length
+    let qty=0, avgCost=0, totalCost=0;
+    if(open){
+      if(ownerFilter){
+        // Owner's qty is proportional to their cost share
+        const ownerCostShare = open.ownerCosts[ownerFilter]||0;
+        const costFrac = open.totalCost>0 ? ownerCostShare/open.totalCost : 0;
+        qty = open.qty*costFrac;
+        totalCost = ownerCostShare;
+        avgCost = qty>0 ? totalCost/qty : 0;
+      } else {
+        qty=open.qty; avgCost=open.avgCost; totalCost=open.totalCost;
+      }
+    }
+    result[ticker]={
+      qty, avgCost, totalCost, realizedPnL:pnl,
+      open: !!open&&qty>1e-10,
+      txCount: state.transactions.filter(tx=>tx.ticker===ticker&&(tx.type==='buy'||tx.type==='sell')).length
     };
   }
   return result;
 }
 
-function calcOwnerBalance(ownerName) {
-  return _replayTxs(ownerName, null);
-}
-
-function calcOwnerBalanceAtDate(ownerName, beforeDate, beforeIndex) {
-  const { cash, openCost } = _replayTxs(ownerName, beforeDate, beforeIndex);
-  return cash + openCost;
-}
-
-function totalPnL(ownerFilter) {
-  const { realized } = _replayTxs(ownerFilter, null);
-  return Object.values(realized).reduce((s, v) => s + v, 0);
-}
-
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 // TABS
-// ══════════════════════════════════════════════
-let currentTab = 'overview';
-let selectedOwner = null;
-
-function showTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.nav-tab').forEach((el, i) => {
-    el.classList.toggle('active', ['overview','stocks','transactions','add'][i] === tab);
-  });
+// ═══════════════════════════════════════════════
+let currentTab='overview', selectedOwner=null;
+function showTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.nav-tab').forEach((el,i)=>
+    el.classList.toggle('active',['overview','stocks','transactions','add'][i]===tab));
   renderMain();
 }
-
-function renderMain() {
-  const el = document.getElementById('main-content');
-  if (currentTab === 'overview') el.innerHTML = renderOverview();
-  else if (currentTab === 'stocks') el.innerHTML = renderStocks();
-  else if (currentTab === 'transactions') el.innerHTML = renderTransactions();
-  else if (currentTab === 'add') el.innerHTML = renderAddForm();
+function renderMain(){
+  const el=document.getElementById('main-content');
+  if(currentTab==='overview') el.innerHTML=renderOverview();
+  else if(currentTab==='stocks') el.innerHTML=renderStocks();
+  else if(currentTab==='transactions') el.innerHTML=renderTransactions();
+  else el.innerHTML=renderAddForm();
 }
-
-function ownerPills() {
-  return `<div class="owner-pills">
-    ${[null, ...state.owners].map(o => `<button class="pill ${selectedOwner===o?'active':''}" onclick="selectOwner(${o===null?'null':`'${o}'`})">${o||'All'}</button>`).join('')}
-  </div>`;
+function ownerPills(){
+  return `<div class="owner-pills">${[null,...state.owners].map(o=>`<button class="pill ${selectedOwner===o?'active':''}" onclick="selectOwner(${o===null?'null':`'${o}'`})">${o||'All'}</button>`).join('')}</div>`;
 }
+function selectOwner(o){ selectedOwner=o; renderMain(); }
 
-function selectOwner(o) { selectedOwner = o; renderMain(); }
-
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 // OVERVIEW
-// ══════════════════════════════════════════════
-function renderOverview() {
-  let totalDeposits = 0, totalFinal = 0, totalPnLAll = 0;
+// ═══════════════════════════════════════════════
+function renderOverview(){
+  const { realized, openPositions } = calcPortfolioPositions();
 
-  const tableRows = state.owners.map(o => {
+  let totDep=0,totFinal=0,totPnL=0,totStock=0,totCash=0;
+
+  const rows = state.owners.map(o=>{
     const b = calcOwnerBalance(o);
-    const pnl = totalPnL(o);
-    const net = b.deposits - b.withdrawals;
-    // Final Balance = free cash + cost basis of open holdings
-    // This equals: deposits - withdrawals - buySpend + sellRevenue + openPositionsCostBasis
-    const finalBal = b.cash + b.openCost;
-    totalDeposits += net; totalFinal += finalBal; totalPnLAll += pnl;
-    const pnlCls = pnl >= 0 ? 'pos' : 'neg';
-    const finalCls = finalBal >= 0 ? 'pos' : 'neg';
-    const sign = pnl >= 0 ? '+' : '';
+    const pnl = Object.values(realized[o]||{}).reduce((s,v)=>s+v,0);
+    const ownerStock = Object.values(openPositions).reduce((s,p)=>s+(p.ownerCosts[o]||0),0);
+    const ownerCash = b.cash;
+    const net = b.deposits-b.withdrawals;
+    const fin = ownerCash+ownerStock;
+    totDep+=net; totFinal+=fin; totPnL+=pnl; totStock+=ownerStock; totCash+=ownerCash;
+    const pC=pnl>=0?'pos':'neg', fC=fin>=0?'pos':'neg';
     return `<tr>
-      <td>${o}</td>
-      <td>${fmt(net)}</td>
-      <td class="${pnlCls}">${sign}${fmt(pnl)}</td>
-      <td class="${finalCls}">${fmt(finalBal)}</td>
+      <td>${o}</td><td>${fmt(net)}</td>
+      <td class="${pC}">${pnl>=0?'+':''}${fmt(pnl)}</td>
+      <td style="color:var(--accent2)">${fmt(ownerStock)}</td>
+      <td style="color:var(--muted)">${fmt(ownerCash)}</td>
+      <td class="${fC}">${fmt(fin)}</td>
     </tr>`;
   }).join('');
 
-  const shownB = selectedOwner ? calcOwnerBalance(selectedOwner) : null;
-  const shownDeposits = selectedOwner ? shownB.deposits - shownB.withdrawals : totalDeposits;
-  const shownPnL = selectedOwner ? totalPnL(selectedOwner) : totalPnLAll;
-  const shownFinal = selectedOwner ? shownB.cash + shownB.openCost : totalFinal;
-  const pnlClass = shownPnL >= 0 ? 'pos' : 'neg';
-  const pnlSign = shownPnL >= 0 ? '+' : '';
-  const finalCls2 = shownFinal >= 0 ? 'pos' : 'neg';
+  let sPnL,sStock,sCash,sFin,sDep;
+  if(selectedOwner){
+    const b=calcOwnerBalance(selectedOwner);
+    sPnL=Object.values(realized[selectedOwner]||{}).reduce((s,v)=>s+v,0);
+    sStock=Object.values(openPositions).reduce((s,p)=>s+(p.ownerCosts[selectedOwner]||0),0);
+    sCash=b.cash; sFin=sCash+sStock; sDep=b.deposits-b.withdrawals;
+  } else { sPnL=totPnL;sStock=totStock;sCash=totCash;sFin=totFinal;sDep=totDep; }
 
-  const recent = [...state.transactions].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,5);
-  const recentHTML = recent.length === 0
-    ? '<div class="empty">No transactions yet. Go to "+ Add" to get started.</div>'
-    : recent.map(tx => txCard(tx)).join('');
-
+  const recent=[...state.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
   return `
     ${ownerPills()}
     <div class="stat-grid">
       <div class="stat-box">
         <div class="stat-label">Realized P&amp;L</div>
-        <div class="stat-val ${pnlClass}">${pnlSign}${fmt(shownPnL)}</div>
+        <div class="stat-val ${sPnL>=0?'pos':'neg'}">${sPnL>=0?'+':''}${fmt(sPnL)}</div>
       </div>
       <div class="stat-box">
         <div class="stat-label">Final Balance</div>
-        <div class="stat-val ${finalCls2}">${fmt(shownFinal)}</div>
+        <div class="stat-val ${sFin>=0?'pos':'neg'}">${fmt(sFin)}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">In Stocks</div>
+        <div class="stat-val" style="color:var(--accent2)">${fmt(sStock)}</div>
+        <div class="stat-sub">cost basis</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Cash</div>
+        <div class="stat-val" style="color:var(--muted)">${fmt(sCash)}</div>
+        <div class="stat-sub">available</div>
       </div>
     </div>
-
     <div class="card" style="padding:0;overflow:hidden;margin-bottom:12px">
       <table class="owner-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Deposit</th>
-            <th>Profit/Loss</th>
-            <th>Final</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Name</th><th>Deposit</th><th>P&amp;L</th><th>Stocks</th><th>Cash</th><th>Final</th></tr></thead>
         <tbody>
-          ${tableRows}
+          ${rows}
           <tr class="total-row">
-            <td>Total</td>
-            <td>${fmt(totalDeposits)}</td>
-            <td class="${totalPnLAll>=0?'pos':'neg'}">${totalPnLAll>=0?'+':''}${fmt(totalPnLAll)}</td>
-            <td class="${totalFinal>=0?'pos':'neg'}">${fmt(totalFinal)}</td>
+            <td>Total</td><td>${fmt(totDep)}</td>
+            <td class="${totPnL>=0?'pos':'neg'}">${totPnL>=0?'+':''}${fmt(totPnL)}</td>
+            <td style="color:var(--accent2)">${fmt(totStock)}</td>
+            <td style="color:var(--muted)">${fmt(totCash)}</td>
+            <td class="${totFinal>=0?'pos':'neg'}">${fmt(totFinal)}</td>
           </tr>
         </tbody>
       </table>
     </div>
-
     <div class="section-title" style="margin-bottom:10px">Recent Activity</div>
-    ${recentHTML}
-  `;
+    ${recent.length?recent.map(tx=>txCard(tx)).join(''):'<div class="empty">No transactions yet.</div>'}`;
 }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 // STOCKS
-// ══════════════════════════════════════════════
-function renderStocks() {
-  const positions = calcStockPositions(selectedOwner);
-  const tickers = Object.keys(positions);
-  if (tickers.length === 0) return ownerPills() + '<div class="empty">No stock transactions yet.<br>Go to "+ Add" to add one.</div>';
-
-  const open = tickers.filter(t => positions[t].open);
-  const closed = tickers.filter(t => !positions[t].open);
-
-  const stockCard = (ticker) => {
-    const p = positions[ticker];
-    const pnlClass = p.realizedPnL >= 0 ? 'pos' : 'neg';
-    const sign = p.realizedPnL >= 0 ? '+' : '';
+// ═══════════════════════════════════════════════
+function renderStocks(){
+  const positions=calcStockPositionsForView(selectedOwner);
+  const tickers=Object.keys(positions);
+  if(!tickers.length) return ownerPills()+'<div class="empty">No stock transactions yet.</div>';
+  const open=tickers.filter(t=>positions[t].open);
+  const closed=tickers.filter(t=>!positions[t].open&&(positions[t].realizedPnL!==0||positions[t].txCount>0));
+  const card=t=>{
+    const p=positions[t]; const pC=p.realizedPnL>=0?'pos':'neg';
     return `<div class="stock-item">
       <div class="stock-top">
-        <span class="stock-name">${ticker} ${p.open ? '<span style="font-size:0.62rem;color:var(--accent);background:rgba(110,231,183,0.1);padding:2px 6px;border-radius:4px;font-weight:700">OPEN</span>' : ''}</span>
-        <span class="stock-pnl ${pnlClass}">${sign}${fmt(p.realizedPnL)}</span>
+        <span class="stock-name">${t}${p.open?' <span style="font-size:.62rem;color:var(--accent);background:rgba(110,231,183,.1);padding:2px 6px;border-radius:4px;font-weight:700">OPEN</span>':''}</span>
+        <span class="stock-pnl ${pC}">${p.realizedPnL>=0?'+':''}${fmt(p.realizedPnL)}</span>
       </div>
       <div class="stock-detail">
-        ${p.open ? `
-          <div class="sdet">Qty Held<span>${p.qty.toFixed(8)}</span></div>
-          <div class="sdet">Avg Cost<span>$${p.avgCost.toFixed(3)}</span></div>
-          <div class="sdet">Cost Basis<span>${fmt(p.totalCost)}</span></div>`
-        : `<div class="sdet">Status<span style="color:var(--muted)">Closed</span></div>
-          <div class="sdet">Realized<span class="${pnlClass}">${sign}${fmt(p.realizedPnL)}</span></div>
-          <div class="sdet">Transactions<span>${p.txCount}</span></div>`}
+        ${p.open
+          ?`<div class="sdet">Qty<span>${p.qty.toFixed(10)}</span></div>
+            <div class="sdet">Avg Cost<span>$${p.avgCost.toFixed(3)}</span></div>
+            <div class="sdet">Cost Basis<span>${fmt(p.totalCost)}</span></div>`
+          :`<div class="sdet">Status<span style="color:var(--muted)">Closed</span></div>
+            <div class="sdet">Realized<span class="${pC}">${p.realizedPnL>=0?'+':''}${fmt(p.realizedPnL)}</span></div>
+            <div class="sdet">Transactions<span>${p.txCount}</span></div>`}
       </div>
     </div>`;
   };
-
-  return `
-    ${ownerPills()}
-    ${open.length > 0 ? `<div class="section-title">Open Positions (${open.length})</div>${open.map(stockCard).join('')}` : ''}
-    ${closed.length > 0 ? `<div class="section-title" style="margin-top:${open.length?'14px':'0'}">Closed Positions (${closed.length})</div>${closed.map(stockCard).join('')}` : ''}
-  `;
+  return `${ownerPills()}
+    ${open.length?`<div class="section-title">Open (${open.length})</div>${open.map(card).join('')}`:''}
+    ${closed.length?`<div class="section-title" style="margin-top:${open.length?14:0}px">Closed (${closed.length})</div>${closed.map(card).join('')}`:''}`;
 }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 // TRANSACTIONS
-// ══════════════════════════════════════════════
-function renderTransactions() {
-  const txs = [...state.transactions].sort((a,b) => new Date(b.date)-new Date(a.date));
-  if (txs.length === 0) return ownerPills() + '<div class="empty">No transactions yet.</div>';
-
-  const filtered = selectedOwner
-    ? txs.filter(tx => tx.shares && (tx.shares[selectedOwner]||0) > 0 || tx.type==='deposit' || tx.type==='withdraw')
-    : txs;
-
-  return `
-    ${ownerPills()}
+// ═══════════════════════════════════════════════
+function renderTransactions(){
+  const txs=[...state.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(!txs.length) return ownerPills()+'<div class="empty">No transactions yet.</div>';
+  const filtered=selectedOwner?txs.filter(tx=>tx.shares&&(tx.shares[selectedOwner]||0)>0):txs;
+  return `${ownerPills()}
     <div class="action-row">
-      <button class="action-btn" onclick="exportCSV()">⬇ Export CSV</button>
-      <button class="action-btn" onclick="clearAll()">🗑 Clear All</button>
+      <button class="action-btn" onclick="exportCSV()">⬇ Export</button>
+      <button class="action-btn" onclick="importCSV()">⬆ Import</button>
+      <button class="action-btn" onclick="clearAll()">🗑 Clear</button>
     </div>
     <div class="section-title">${filtered.length} transactions</div>
-    ${filtered.map(tx => txCard(tx, true)).join('')}
-  `;
+    ${filtered.map(tx=>txCard(tx,true)).join('')}`;
 }
 
-function txCard(tx, showDelete = false) {
-  const typeMap = { buy:'BUY', sell:'SELL', deposit:'DEP', withdraw:'WIT' };
-  const badgeClass = { buy:'buy', sell:'sell', deposit:'dep', withdraw:'wit' };
-  const amt = (tx.type==='deposit'||tx.type==='withdraw') ? tx.amount : tx.qty*tx.price;
-  const netAmt = tx.type==='buy' ? amt+TX_COST : tx.type==='sell' ? amt-TX_COST : amt;
-  const sign = (tx.type==='sell'||tx.type==='deposit') ? '+' : '-';
-  const amtClass = (tx.type==='sell'||tx.type==='deposit') ? 'pos' : tx.type==='buy' ? 'neg' : 'neu';
-  const ownersStr = tx.shares ? state.owners.filter(o => (tx.shares[o]||0)>0).map(o => `${o} ${tx.shares[o]}%`).join(' · ') : '';
-
+function txCard(tx,showDelete=false){
+  const bC={buy:'buy',sell:'sell',deposit:'dep',withdraw:'wit'};
+  const lbl={buy:'BUY',sell:'SELL',deposit:'DEP',withdraw:'WIT'};
+  const amt=(tx.type==='deposit'||tx.type==='withdraw')?tx.amount:tx.qty*tx.price;
+  const net=tx.type==='buy'?amt+TX_COST:tx.type==='sell'?amt-TX_COST:amt;
+  const sign=(tx.type==='sell'||tx.type==='deposit')?'+':'-';
+  const aC=(tx.type==='sell'||tx.type==='deposit')?'pos':tx.type==='buy'?'neg':'neu';
+  const ow=tx.shares?state.owners.filter(o=>(tx.shares[o]||0)>0).map(o=>`${o} ${tx.shares[o]}%`).join(' · '):'';
   return `<div class="tx-item">
-    <div class="tx-badge ${badgeClass[tx.type]}">${typeMap[tx.type]}</div>
+    <div class="tx-badge ${bC[tx.type]}">${lbl[tx.type]}</div>
     <div class="tx-info">
       <div class="tx-top">
         <span class="tx-name">${tx.ticker||'Cash'}</span>
-        <span class="tx-amount ${amtClass}">${sign}${fmt(netAmt)}</span>
+        <span class="tx-amount ${aC}">${sign}${fmt(net)}</span>
       </div>
-      <div class="tx-meta">${tx.date}${tx.qty ? ` · ${tx.qty} @ $${tx.price} · $${TX_COST} fee` : ''}</div>
-      ${tx.note ? `<div class="tx-meta" style="color:var(--muted)">${tx.note}</div>` : ''}
-      ${ownersStr ? `<div class="tx-owners">${ownersStr}</div>` : ''}
+      <div class="tx-meta">${tx.date}${tx.qty?` · ${tx.qty} @ $${tx.price} · $${TX_COST} fee`:''}${tx.note?` · ${tx.note}`:''}</div>
+      ${ow?`<div class="tx-owners">${ow}</div>`:''}
     </div>
-    ${showDelete ? `<button class="danger-btn" onclick="deleteTx('${tx.id}')">✕</button>` : ''}
+    ${showDelete?`<button class="danger-btn" onclick="deleteTx('${tx.id}')">✕</button>`:''}
   </div>`;
 }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 // ADD FORM
-// ══════════════════════════════════════════════
-let formState = {
-  type: 'buy', ticker: '', qty: '', price: '', amount: '',
-  date: new Date().toISOString().slice(0,10), note: '',
-  ownerShares: {}
+// ═══════════════════════════════════════════════
+let formState={
+  type:'buy',ticker:'',qty:'',price:'',amount:'',
+  date:new Date().toISOString().slice(0,10),
+  note:'',ownerShares:{},_witOwner:'',witPrices:{}
 };
 
-function resetForm() {
-  formState.type = 'buy'; formState.ticker = ''; formState.qty = ''; formState.price = '';
-  formState.amount = ''; formState.date = new Date().toISOString().slice(0,10);
-  formState.note = ''; formState.ownerShares = {};
-  state.owners.forEach(o => { formState.ownerShares[o] = ''; });
+function resetForm(){
+  formState={type:'buy',ticker:'',qty:'',price:'',amount:'',
+    date:new Date().toISOString().slice(0,10),
+    note:'',ownerShares:{},_witOwner:'',witPrices:{}};
+  state.owners.forEach(o=>{formState.ownerShares[o]='';});
 }
 
-function renderAddForm() {
-  state.owners.forEach(o => { if (formState.ownerShares[o] === undefined) formState.ownerShares[o] = ''; });
-  const isCash = formState.type==='deposit' || formState.type==='withdraw';
-  const pctTotal = state.owners.reduce((s,o) => s+(parseFloat(formState.ownerShares[o])||0), 0);
-  const pctOk = Math.abs(pctTotal-100) < 0.01;
+function renderAddForm(){
+  state.owners.forEach(o=>{if(formState.ownerShares[o]===undefined)formState.ownerShares[o]='';});
+  const isCash=formState.type==='deposit'||formState.type==='withdraw';
+  const isWit=formState.type==='withdraw';
+  const pctTotal=state.owners.reduce((s,o)=>s+(parseFloat(formState.ownerShares[o])||0),0);
+  const pctOk=Math.abs(pctTotal-100)<0.01;
 
-  let tickerSection = '';
-  if (!isCash) {
-    if (formState.type === 'sell') {
-      const positions = calcStockPositions(null);
-      const openTickers = Object.keys(positions).filter(t => positions[t].open);
-      if (openTickers.length === 0) {
-        tickerSection = `<div class="form-section">
-          <label class="form-label">Ticker Symbol</label>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:0.82rem;color:var(--muted)">No open positions to sell</div>
-        </div>`;
-      } else {
-        tickerSection = `<div class="form-section">
-          <label class="form-label">Ticker Symbol</label>
+  // Ticker section
+  let tickerSec='';
+  if(!isCash){
+    if(formState.type==='sell'){
+      const pos=calcStockPositionsForView(null);
+      const open=Object.keys(pos).filter(t=>pos[t].open);
+      tickerSec=!open.length
+        ?`<div class="form-section"><label class="form-label">Ticker</label><div class="info-box">No open positions.</div></div>`
+        :`<div class="form-section"><label class="form-label">Ticker</label>
           <select class="form-input" onchange="onSellTickerChange(this.value)">
-            <option value="">— Select ticker —</option>
-            ${openTickers.map(t => {
-              const p = positions[t];
-              return `<option value="${t}" ${formState.ticker===t?'selected':''}>${t} · ${p.qty.toFixed(8)} held · avg $${p.avgCost.toFixed(3)}</option>`;
-            }).join('')}
+            <option value="">— Select —</option>
+            ${open.map(t=>`<option value="${t}" ${formState.ticker===t?'selected':''}>${t} · ${pos[t].qty.toFixed(10)} · avg $${pos[t].avgCost.toFixed(3)}</option>`).join('')}
           </select>
-          ${formState.ticker ? `<div style="font-size:0.7rem;color:var(--accent);margin-top:5px;font-family:'Roboto Mono',monospace">
-            In hand: ${positions[formState.ticker]?.qty.toFixed(8)||'—'} shares · cost basis ${fmt(positions[formState.ticker]?.totalCost||0)}
-          </div>` : ''}
+          ${formState.ticker?`<div style="font-size:.7rem;color:var(--accent);margin-top:5px;font-family:'Roboto Mono',monospace">In hand: ${pos[formState.ticker]?.qty.toFixed(10)||'—'} · Basis: ${fmt(pos[formState.ticker]?.totalCost||0)}</div>`:''}
         </div>`;
-      }
     } else {
-      tickerSection = `<div class="form-section">
-        <label class="form-label">Ticker Symbol</label>
+      tickerSec=`<div class="form-section"><label class="form-label">Ticker</label>
         <input class="form-input" type="text" placeholder="e.g. RKLB" value="${formState.ticker}"
-          oninput="formState.ticker=this.value.toUpperCase();this.value=formState.ticker" style="text-transform:uppercase" />
+          oninput="formState.ticker=this.value.toUpperCase();this.value=formState.ticker" style="text-transform:uppercase"/>
       </div>`;
     }
   }
 
-  // Gross amount preview
-  const grossPreview = (!isCash && formState.qty && formState.price)
-    ? `<div style="font-size:0.7rem;color:var(--muted);margin-top:4px;font-family:'Roboto Mono',monospace">
-        Gross: $${(parseFloat(formState.qty)*parseFloat(formState.price)).toFixed(2)} · Fee: $${TX_COST.toFixed(2)} · Net: $${(parseFloat(formState.qty)*parseFloat(formState.price)+(formState.type==='buy'?TX_COST:-TX_COST)).toFixed(2)}
-      </div>` : '';
+  // Gross preview
+  const gp=(!isCash&&formState.qty&&formState.price)
+    ?`<div style="font-size:.7rem;color:var(--muted);margin-top:4px;font-family:'Roboto Mono',monospace">Gross:$${(parseFloat(formState.qty)*parseFloat(formState.price)).toFixed(2)} · Fee:$${TX_COST} · Net:$${(parseFloat(formState.qty)*parseFloat(formState.price)+(formState.type==='buy'?TX_COST:-TX_COST)).toFixed(2)}</div>`:'';
+
+  // Withdraw analysis
+  const witAnalysis = isWit ? renderWithdrawAnalysis() : '';
 
   return `
     <div class="form-section">
-      <label class="form-label">Transaction Type</label>
+      <label class="form-label">Type</label>
       <div class="type-btns">
         <button class="type-btn ${formState.type==='buy'?'active-buy':''}" onclick="setType('buy')">Buy</button>
         <button class="type-btn ${formState.type==='sell'?'active-sell':''}" onclick="setType('sell')">Sell</button>
@@ -761,284 +574,334 @@ function renderAddForm() {
         <button class="type-btn ${formState.type==='withdraw'?'active-wit':''}" onclick="setType('withdraw')">Withdraw</button>
       </div>
     </div>
-
-    ${tickerSection}
-
-    ${!isCash ? `
+    ${tickerSec}
+    ${!isCash?`
     <div class="form-row form-section">
       <div>
-        <label class="form-label">Quantity <span style="font-weight:400;opacity:0.6">(8 dec.)</span></label>
-        <input class="form-input" type="number" step="0.00000001" inputmode="decimal" placeholder="0.00000000"
-          value="${formState.qty}" oninput="formState.qty=this.value;updateGrossPreview()" />
+        <label class="form-label">Qty <span style="font-weight:400;opacity:.6">(10 dec.)</span></label>
+        <input class="form-input" type="number" step="0.0000000001" inputmode="decimal" placeholder="0.0000000000" value="${formState.qty}" oninput="formState.qty=this.value"/>
       </div>
       <div>
-        <label class="form-label">Price ($) <span style="font-weight:400;opacity:0.6">(3 dec.)</span></label>
-        <input class="form-input" type="number" step="0.001" inputmode="decimal" placeholder="0.000"
-          value="${formState.price}" oninput="formState.price=this.value;updateGrossPreview()" />
+        <label class="form-label">Price ($)</label>
+        <input class="form-input" type="number" step="0.001" inputmode="decimal" placeholder="0.000" value="${formState.price}" oninput="formState.price=this.value"/>
       </div>
-    </div>
-    <div id="gross-preview">${grossPreview}</div>
-    ` : `
+    </div>${gp}`:`
     <div class="form-section">
       <label class="form-label">Amount ($)</label>
-      <input class="form-input" type="number" step="any" inputmode="decimal" placeholder="0.00"
-        value="${formState.amount}" oninput="formState.amount=this.value" />
-    </div>
-    `}
-
+      <input class="form-input" type="number" step="any" inputmode="decimal" placeholder="0.00" value="${formState.amount}" oninput="formState.amount=this.value;refreshWitAnalysis()"/>
+    </div>`}
     <div class="form-section">
       <label class="form-label">Date</label>
-      <input class="form-input" type="date" value="${formState.date}" oninput="formState.date=this.value" />
+      <input class="form-input" type="date" value="${formState.date}" oninput="formState.date=this.value"/>
     </div>
-
+    ${isWit?`
+    <div class="form-section">
+      <label class="form-label">Withdrawing Owner</label>
+      <select class="form-input" onchange="setWitOwner(this.value)">
+        <option value="">— Select owner —</option>
+        ${state.owners.map(o=>`<option value="${o}" ${formState._witOwner===o?'selected':''}>${o}</option>`).join('')}
+      </select>
+    </div>
+    <div id="wit-analysis">${witAnalysis}</div>
+    `:`
     <div class="form-section">
       <label class="form-label">Owner Shares (%)</label>
       <div class="pct-row">
-        ${state.owners.map(o => `
+        ${state.owners.map(o=>`
           <div class="pct-input-wrap">
             <span class="pct-label">${o}</span>
             <input class="pct-input" type="number" min="0" max="100" step="any"
               placeholder="0" value="${formState.ownerShares[o]||''}"
-              oninput="formState.ownerShares['${o}']=this.value;updatePctTotal()" />
-            <span style="font-size:0.72rem;color:var(--muted)">%</span>
-          </div>
-        `).join('')}
+              oninput="formState.ownerShares['${o}']=this.value;updatePctTotal()"/>
+            <span style="font-size:.72rem;color:var(--muted)">%</span>
+          </div>`).join('')}
       </div>
       <div class="pct-total ${pctOk?'pos':pctTotal>0?'neg':'neu'}" id="pct-total">
-        Total: ${pctTotal.toFixed(1)}% ${pctOk?'✓':pctTotal>0?'(must equal 100%)':''}
+        Total: ${pctTotal.toFixed(1)}% ${pctOk?'✓':pctTotal>0?'(must = 100%)':''}
       </div>
-      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
-        <button class="type-btn" onclick="setProportionalSplit()" style="flex:none;padding:5px 10px;font-size:0.7rem">⚖ By Balance</button>
-        <button class="type-btn" onclick="clearShares()" style="flex:none;padding:5px 10px;font-size:0.7rem">Clear</button>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="type-btn" onclick="setProportionalSplit()" style="flex:none;padding:5px 10px;font-size:.7rem">⚖ By Balance</button>
+        <button class="type-btn" onclick="clearShares()" style="flex:none;padding:5px 10px;font-size:.7rem">Clear</button>
       </div>
-    </div>
-
+    </div>`}
     <div class="form-section">
       <label class="form-label">Note (optional)</label>
-      <input class="form-input" type="text" placeholder="Optional note" value="${formState.note}"
-        oninput="formState.note=this.value" />
+      <input class="form-input" type="text" placeholder="Optional note" value="${formState.note}" oninput="formState.note=this.value"/>
     </div>
-
     <button class="submit-btn" onclick="submitTransaction()">Add Transaction</button>
-    <button class="type-btn" onclick="resetForm();renderMain()" style="width:100%;margin-top:8px;padding:9px">Reset</button>
-  `;
+    <button class="type-btn" onclick="resetForm();renderMain()" style="width:100%;margin-top:8px;padding:9px">Reset</button>`;
 }
 
-function updateGrossPreview() {
-  const el = document.getElementById('gross-preview');
-  if (!el) return;
-  const qty = parseFloat(formState.qty), price = parseFloat(formState.price);
-  if (qty > 0 && price > 0) {
-    const gross = qty * price;
-    const net = gross + (formState.type==='buy' ? TX_COST : -TX_COST);
-    el.innerHTML = `<div style="font-size:0.7rem;color:var(--muted);margin-top:4px;font-family:'Roboto Mono',monospace">
-      Gross: $${gross.toFixed(2)} · Fee: $${TX_COST.toFixed(2)} · Net: $${net.toFixed(2)}
-    </div>`;
-  } else {
-    el.innerHTML = '';
+// ═══════════════════════════════════════════════
+// WITHDRAW ANALYSIS (Madde 4)
+// ═══════════════════════════════════════════════
+function setWitOwner(o){
+  formState._witOwner=o;
+  formState.ownerShares={};
+  state.owners.forEach(ow=>{ formState.ownerShares[ow]= ow===o?'100':'0'; });
+  refreshWitAnalysis();
+}
+function refreshWitAnalysis(){
+  const el=document.getElementById('wit-analysis');
+  if(el) el.innerHTML=renderWithdrawAnalysis();
+}
+function renderWithdrawAnalysis(){
+  const owner=formState._witOwner;
+  const amount=parseFloat(formState.amount)||0;
+  if(!owner) return '';
+
+  const b = calcOwnerBalance(owner);
+  const { openPositions } = calcPortfolioPositions();
+  const ownerCash = b.cash;
+  const ownerStock = Object.values(openPositions).reduce((s,p)=>s+(p.ownerCosts[owner]||0),0);
+  const totalAvail = ownerCash+ownerStock;
+
+  if(!amount) return `<div class="info-box">${owner}: <b>${fmt(ownerCash)}</b> cash + <b>${fmt(ownerStock)}</b> in stocks = <b>${fmt(totalAvail)}</b> total</div>`;
+
+  if(amount>totalAvail+0.01){
+    return `<div class="info-box" style="color:var(--red)">⚠ Insufficient. ${owner} has ${fmt(ownerCash)} cash + ${fmt(ownerStock)} stocks = ${fmt(totalAvail)}. Cannot withdraw ${fmt(amount)}.</div>`;
   }
-}
 
-function setType(t) {
-  const prev = formState.type;
-  formState.type = t;
-  if ((prev==='sell') !== (t==='sell')) { formState.ticker=''; formState.qty=''; }
-  renderMain();
-}
-
-function onSellTickerChange(ticker) {
-  formState.ticker = ticker;
-  if (ticker) {
-    const positions = calcStockPositions(null);
-    if (positions[ticker]) formState.qty = positions[ticker].qty.toFixed(8);
-  } else {
-    formState.qty = '';
+  if(amount<=ownerCash+0.01){
+    return `<div class="info-box" style="color:var(--green)">✓ ${owner} has ${fmt(ownerCash)} cash. Withdrawal from cash only.</div>`;
   }
-  renderMain();
-}
 
-function setProportionalSplit() {
-  // Include ALL already-saved transactions (regardless of date), since the user
-  // has entered them in the correct chronological order. The new transaction
-  // being added is not yet saved, so state.transactions.length is the right cutoff.
-  const beforeIndex = state.transactions.length; // all saved txs, none of the new one
-  const balances = {};
-  state.owners.forEach(o => {
-    balances[o] = Math.max(0, calcOwnerBalanceAtDate(o, null, beforeIndex));
+  // Needs stock liquidation
+  const stockNeeded = amount-ownerCash;
+  const openTickers = Object.keys(openPositions).filter(t=>(openPositions[t].ownerCosts[owner]||0)>0);
+
+  // Need current prices
+  const missingPrices = openTickers.filter(t=>!formState.witPrices[t]||parseFloat(formState.witPrices[t])<=0);
+
+  const priceInputs = `<div style="margin-top:8px">
+    <div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Enter current prices to calculate</div>
+    ${openTickers.map(t=>`
+      <div class="wit-price-row">
+        <span>${t} (${openPositions[t].qty.toFixed(6)} total shares)</span>
+        <div style="display:flex;align-items:center;gap:4px">
+          <span style="color:var(--muted);font-size:.75rem">$</span>
+          <input class="pct-input" style="width:80px" type="number" step="0.001" inputmode="decimal"
+            placeholder="0.000" value="${formState.witPrices[t]||''}"
+            oninput="formState.witPrices['${t}']=this.value;refreshWitAnalysis()"/>
+        </div>
+      </div>`).join('')}
+  </div>`;
+
+  if(missingPrices.length>0){
+    return `<div class="info-box" style="color:var(--accent2)">
+      ⚠ ${owner} has ${fmt(ownerCash)} cash but needs ${fmt(stockNeeded)} more from stocks. Enter current prices:
+    </div>${priceInputs}`;
+  }
+
+  // Compute owner's market value per ticker
+  let ownerMarketTotal=0;
+  const tickerMarketVals={};
+  openTickers.forEach(t=>{
+    const price=parseFloat(formState.witPrices[t])||0;
+    const ownerCostShare=openPositions[t].ownerCosts[owner]||0;
+    const costFrac=openPositions[t].totalCost>0?ownerCostShare/openPositions[t].totalCost:0;
+    const ownerQty=openPositions[t].qty*costFrac;
+    tickerMarketVals[t]={price,ownerQty,marketVal:ownerQty*price};
+    ownerMarketTotal+=ownerQty*price;
   });
-  const totalBal = Object.values(balances).reduce((s,v) => s+v, 0);
 
-  if (totalBal <= 0) {
-    // No prior balance — equal split
-    const n = state.owners.length;
-    state.owners.forEach(o => { formState.ownerShares[o] = (100/n).toFixed(5); });
-    toast('No prior balance found — equal split applied');
+  const totalMarket=ownerCash+ownerMarketTotal;
+  if(amount>totalMarket+0.01){
+    return `<div class="info-box" style="color:var(--red)">⚠ At current prices, ${owner} has ${fmt(ownerCash)} + ${fmt(ownerMarketTotal)} stocks = ${fmt(totalMarket)}. Cannot withdraw ${fmt(amount)}.</div>`;
+  }
+
+  const stockFracToReduce=stockNeeded/ownerMarketTotal;
+  return `<div class="info-box" style="color:var(--green)">
+    ✓ Withdrawal plan:<br>
+    From cash: <b>${fmt(ownerCash)}</b><br>
+    From stocks: <b>${fmt(stockNeeded)}</b> (reduce each by ${(stockFracToReduce*100).toFixed(2)}%)<br>
+    ${openTickers.map(t=>{
+      const v=tickerMarketVals[t];
+      const sellQty=v.ownerQty*stockFracToReduce;
+      return `→ Sell ~<b>${sellQty.toFixed(6)}</b> ${t} @ $${v.price} = ${fmt(sellQty*v.price)}`;
+    }).join('<br>')}
+  </div>${priceInputs}`;
+}
+
+// ═══════════════════════════════════════════════
+// FORM HELPERS
+// ═══════════════════════════════════════════════
+function setType(t){
+  const prev=formState.type; formState.type=t;
+  if((prev==='sell')!==(t==='sell')){formState.ticker='';formState.qty='';}
+  if(t!=='withdraw'){formState._witOwner='';formState.witPrices={};}
+  renderMain();
+}
+function onSellTickerChange(ticker){
+  formState.ticker=ticker;
+  if(ticker){ const p=calcStockPositionsForView(null); if(p[ticker]) formState.qty=p[ticker].qty.toFixed(10); }
+  else formState.qty='';
+  renderMain();
+}
+function setProportionalSplit(){
+  const beforeIndex=state.transactions.length;
+  const balances={};
+  state.owners.forEach(o=>{
+    const b=calcOwnerBalanceAtPoint(o,beforeIndex);
+    balances[o]=Math.max(0, b.cash+b.openCost);
+  });
+  const tot=Object.values(balances).reduce((s,v)=>s+v,0);
+  if(tot<=0){
+    const n=state.owners.length;
+    state.owners.forEach(o=>{formState.ownerShares[o]=(100/n).toFixed(5);});
+    toast('No prior balance — equal split');
   } else {
-    let remaining = 100;
-    state.owners.forEach((o, i) => {
-      if (i === state.owners.length - 1) {
-        formState.ownerShares[o] = remaining.toFixed(5);
-      } else {
-        const pct = parseFloat(((balances[o] / totalBal) * 100).toFixed(5));
-        formState.ownerShares[o] = String(pct);
-        remaining -= pct;
-      }
+    let rem=100;
+    state.owners.forEach((o,i)=>{
+      if(i===state.owners.length-1){ formState.ownerShares[o]=rem.toFixed(5); }
+      else { const p=parseFloat(((balances[o]/tot)*100).toFixed(5)); formState.ownerShares[o]=String(p); rem-=p; }
     });
-    const hint = state.owners.map(o => `${o}: ${parseFloat(formState.ownerShares[o]).toFixed(1)}%`).join(' · ');
-    toast('Split by balance: ' + hint);
+    toast('Split: '+state.owners.map(o=>`${o} ${parseFloat(formState.ownerShares[o]).toFixed(1)}%`).join(' · '));
   }
   renderMain();
 }
-
-function clearShares() {
-  state.owners.forEach(o => { formState.ownerShares[o] = ''; });
-  renderMain();
+function clearShares(){ state.owners.forEach(o=>{formState.ownerShares[o]='';});renderMain(); }
+function updatePctTotal(){
+  const tot=state.owners.reduce((s,o)=>s+(parseFloat(formState.ownerShares[o])||0),0);
+  const el=document.getElementById('pct-total'); if(!el)return;
+  const ok=Math.abs(tot-100)<0.01;
+  el.textContent=`Total: ${tot.toFixed(1)}% ${ok?'✓':tot>0?'(must = 100%)':''}`;
+  el.className=`pct-total ${ok?'pos':tot>0?'neg':'neu'}`;
 }
-
-function updatePctTotal() {
-  const total = state.owners.reduce((s,o) => s+(parseFloat(formState.ownerShares[o])||0), 0);
-  const el = document.getElementById('pct-total');
-  if (!el) return;
-  const ok = Math.abs(total-100) < 0.01;
-  el.textContent = `Total: ${total.toFixed(1)}% ${ok?'✓':total>0?'(must equal 100%)':''}`;
-  el.className = `pct-total ${ok?'pos':total>0?'neg':'neu'}`;
-}
-
-function submitTransaction() {
-  const t = formState.type;
-  const isCash = t==='deposit' || t==='withdraw';
-  if (!isCash) {
-    if (!formState.ticker.trim()) { toast('Enter a ticker symbol'); return; }
-    if (!formState.qty || parseFloat(formState.qty) <= 0) { toast('Enter quantity'); return; }
-    if (!formState.price || parseFloat(formState.price) <= 0) { toast('Enter price'); return; }
+function submitTransaction(){
+  const t=formState.type, isCash=t==='deposit'||t==='withdraw';
+  if(!isCash){
+    if(!formState.ticker.trim()){toast('Enter ticker');return;}
+    if(!formState.qty||parseFloat(formState.qty)<=0){toast('Enter quantity');return;}
+    if(!formState.price||parseFloat(formState.price)<=0){toast('Enter price');return;}
   } else {
-    if (!formState.amount || parseFloat(formState.amount) <= 0) { toast('Enter amount'); return; }
+    if(!formState.amount||parseFloat(formState.amount)<=0){toast('Enter amount');return;}
   }
-  if (!formState.date) { toast('Enter a date'); return; }
-  const total = state.owners.reduce((s,o) => s+(parseFloat(formState.ownerShares[o])||0), 0);
-  if (Math.abs(total-100) > 0.1) { toast('Owner shares must total 100%'); return; }
-
-  const shares = {};
-  state.owners.forEach(o => { shares[o] = parseFloat(formState.ownerShares[o])||0; });
-
-  const tx = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
-    type: t, date: formState.date,
-    ticker: isCash ? '' : formState.ticker.trim().toUpperCase(),
-    qty: isCash ? 0 : parseFloat(formState.qty),
-    price: isCash ? 0 : parseFloat(formState.price),
-    amount: isCash ? parseFloat(formState.amount) : 0,
-    note: formState.note.trim(), shares
+  if(!formState.date){toast('Enter date');return;}
+  const tot=state.owners.reduce((s,o)=>s+(parseFloat(formState.ownerShares[o])||0),0);
+  if(Math.abs(tot-100)>0.1){toast('Shares must total 100%');return;}
+  const shares={};
+  state.owners.forEach(o=>{shares[o]=parseFloat(formState.ownerShares[o])||0;});
+  const tx={
+    id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),
+    type:t,date:formState.date,
+    ticker:isCash?'':formState.ticker.trim().toUpperCase(),
+    qty:isCash?0:parseFloat(formState.qty),
+    price:isCash?0:parseFloat(formState.price),
+    amount:isCash?parseFloat(formState.amount):0,
+    note:formState.note.trim(),shares
   };
-
-  state.transactions.push(tx);
-  saveState();
-  toast('Transaction added ✓');
-  resetForm();
-  renderMain();
+  state.transactions.push(tx); saveState();
+  toast('Transaction added ✓'); resetForm(); renderMain();
 }
-
-function deleteTx(id) {
-  if (!confirm('Delete this transaction?')) return;
-  state.transactions = state.transactions.filter(tx => tx.id !== id);
+function deleteTx(id){
+  if(!confirm('Delete?'))return;
+  state.transactions=state.transactions.filter(tx=>tx.id!==id);
   saveState(); renderMain();
 }
-
-function clearAll() {
-  if (!confirm('Delete ALL transactions? This cannot be undone.')) return;
-  state.transactions = []; saveState(); renderMain();
+function clearAll(){
+  if(!confirm('Delete ALL transactions? Cannot be undone.'))return;
+  state.transactions=[]; saveState(); renderMain();
 }
 
-// ══════════════════════════════════════════════
-// EXPORT
-// ══════════════════════════════════════════════
-function exportCSV() {
-  const rows = [['Date','Type','Ticker','Qty','Price','Fee','Net',...state.owners,'Note']];
-  for (const tx of [...state.transactions].sort((a,b)=>new Date(a.date)-new Date(b.date))) {
-    const gross = tx.qty*tx.price;
-    const net = tx.type==='buy' ? gross+TX_COST : tx.type==='sell' ? gross-TX_COST : tx.amount;
-    rows.push([tx.date,tx.type,tx.ticker,tx.qty||'',tx.price||'',TX_COST,net.toFixed(2),
-      ...state.owners.map(o=>(tx.shares?.[o]||0)+'%'),tx.note]);
+// ═══════════════════════════════════════════════
+// EXPORT / IMPORT  (Madde 4: backup & restore)
+// ═══════════════════════════════════════════════
+function exportCSV(){
+  const rows=[['ID','Date','Type','Ticker','Qty','Price','Amount','Note',...state.owners]];
+  for(const tx of getSortedTxs(state.transactions)){
+    rows.push([tx.id,tx.date,tx.type,tx.ticker,tx.qty||'',tx.price||'',tx.amount||'',tx.note,
+      ...state.owners.map(o=>tx.shares?(tx.shares[o]||0):0)]);
   }
-  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download = 'portfolio_export.csv'; a.click();
-  toast('CSV downloaded ✓');
+  const csv=rows.map(r=>r.map(c=>`"${String(c===undefined?'':c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`portfolio_backup_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); toast('Exported ✓');
+}
+function importCSV(){
+  const input=document.createElement('input'); input.type='file'; input.accept='.csv';
+  input.onchange=e=>{
+    const file=e.target.files[0]; if(!file)return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      try{
+        const lines=ev.target.result.trim().split('\n');
+        const hdrs=lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
+        const g=(row,col)=>(row[hdrs.indexOf(col)]||'').replace(/^"|"$/g,'').trim();
+        const existing=new Set(state.transactions.map(tx=>tx.id));
+        let n=0;
+        for(let i=1;i<lines.length;i++){
+          const row=lines[i].match(/("(?:[^"]|"")*"|[^,]*)/g)||[];
+          const type=g(row,'Type');
+          if(!['buy','sell','deposit','withdraw'].includes(type)) continue;
+          const id=g(row,'ID')||Date.now().toString(36)+i;
+          if(existing.has(id)) continue;
+          const shares={};
+          state.owners.forEach(o=>{shares[o]=parseFloat(g(row,o))||0;});
+          state.transactions.push({
+            id,type,date:g(row,'Date'),
+            ticker:g(row,'Ticker'),
+            qty:parseFloat(g(row,'Qty'))||0,
+            price:parseFloat(g(row,'Price'))||0,
+            amount:parseFloat(g(row,'Amount'))||0,
+            note:g(row,'Note'),shares
+          }); n++;
+        }
+        saveState(); renderMain(); toast(`Imported ${n} transactions ✓`);
+      }catch(err){toast('Import error: '+err.message);}
+    };
+    reader.readAsText(file);
+  };
+  input.click();
 }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 // SETTINGS
-// ══════════════════════════════════════════════
-function openSettings() {
-  document.getElementById('modal-title').textContent = 'Settings';
-  document.getElementById('modal-body').innerHTML = `
+// ═══════════════════════════════════════════════
+function openSettings(){
+  document.getElementById('modal-title').textContent='Settings';
+  document.getElementById('modal-body').innerHTML=`
     <div style="margin-bottom:16px">
       <div class="section-title">Appearance</div>
       <div class="setting-row">
-        <div>
-          <div class="setting-label">Light Theme</div>
-          <div class="setting-sub">Switch between dark and light mode</div>
-        </div>
-        <label class="toggle">
-          <input type="checkbox" ${state.theme==='light'?'checked':''} onchange="toggleThemeFromSettings(this.checked)" />
-          <span class="toggle-slider"></span>
-        </label>
+        <div><div class="setting-label">Light Theme</div></div>
+        <label class="toggle"><input type="checkbox" ${state.theme==='light'?'checked':''} onchange="toggleThemeS(this.checked)"/><span class="toggle-slider"></span></label>
       </div>
     </div>
-
     <div class="section-title">Owners</div>
     <div id="owners-list">
-      ${state.owners.map((o,i) => `
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-          <input class="form-input" type="text" value="${o}" oninput="state.owners[${i}]=this.value" style="flex:1" />
-          ${state.owners.length > 1 ? `<button class="danger-btn" onclick="removeOwner(${i})">✕</button>` : ''}
-        </div>
-      `).join('')}
+      ${state.owners.map((o,i)=>`<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <input class="form-input" type="text" value="${o}" oninput="state.owners[${i}]=this.value" style="flex:1"/>
+        ${state.owners.length>1?`<button class="danger-btn" onclick="removeOwner(${i})">✕</button>`:''}
+      </div>`).join('')}
     </div>
     <button class="action-btn" onclick="addOwner()" style="width:100%;margin-top:4px;margin-bottom:16px">+ Add Owner</button>
-    <button class="submit-btn" onclick="saveOwners()">Save</button>
-  `;
+    <button class="submit-btn" onclick="saveOwners()">Save</button>`;
   document.getElementById('modal-overlay').classList.add('open');
 }
+function toggleThemeS(v){ state.theme=v?'light':'dark'; saveState(); applyTheme(); }
+function addOwner(){ state.owners.push('New'); openSettings(); }
+function removeOwner(i){ state.owners.splice(i,1); openSettings(); }
+function saveOwners(){ state.owners=state.owners.map(o=>o.trim()).filter(Boolean); saveState(); closeModal(); renderMain(); toast('Saved ✓'); }
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
 
-function toggleThemeFromSettings(checked) {
-  state.theme = checked ? 'light' : 'dark';
-  saveState(); applyTheme();
-}
-
-function addOwner() { state.owners.push('New'); openSettings(); }
-function removeOwner(i) { state.owners.splice(i,1); openSettings(); }
-
-function saveOwners() {
-  state.owners = state.owners.map(o=>o.trim()).filter(Boolean);
-  saveState(); closeModal(); renderMain();
-  toast('Owners saved ✓');
-}
-
-function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
-
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 // UTILS
-// ══════════════════════════════════════════════
-function fmt(n) {
-  const s = Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-  return (n<0?'-':'')+'$'+s;
+// ═══════════════════════════════════════════════
+function fmt(n){
+  return (n<0?'-':'')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
 }
 
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'), 2200);
-}
-
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 // INIT
-// ══════════════════════════════════════════════
-loadState();
-resetForm();
-state.owners.forEach(o => { if (!formState.ownerShares[o]) formState.ownerShares[o]=''; });
-renderMain();
+// ═══════════════════════════════════════════════
+loadState(); resetForm(); renderMain();
 </script>
 </body>
 </html>
