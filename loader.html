@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>Portfolio Data Loader</title>
+<style>
+  body { font-family: sans-serif; background: #0a0a0f; color: #e8e8f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; flex-direction: column; gap: 20px; padding: 24px; text-align: center; }
+  h2 { color: #6ee7b7; margin: 0; }
+  p { color: #6b7080; font-size: 0.9rem; margin: 0; }
+  button { padding: 16px 32px; background: #6ee7b7; color: #0a0a0f; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; }
+  .result { font-size: 1.1rem; font-weight: 700; }
+  .ok { color: #6ee7b7; }
+  .err { color: #f87171; }
+</style>
+</head>
+<body>
+<h2>Portfolio Data Loader</h2>
+<p>Bu sayfa 58 işlemi Portfolio Tracker uygulamasına yükler.<br>Aşağıdaki butona basın.</p>
+<button onclick='loadData()'>Verileri Yükle</button>
+<div id='result'></div>
+<script>
+function loadData() {
+  try {
+    const transactions = [
+  {
+    "id": "imp1ir9l",
+    "type": "deposit",
+    "date": "2026-04-30",
+    "ticker": "",
+    "qty": 0,
+    "price": 0,
+    "amount": 935.05,
+    "note": "",
+    "shares": {
+      "Murat": 0,
+      "Yusuf": 100,
+      "Cüneyt": 0,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp2rgyi",
+    "type": "buy",
+    "date": "2026-04-30",
+    "ticker": "UAMY",
+    "qty": 91.7043222,
+    "price": 10.18,
+    "amount": 935.05,
+    "note": "",
+    "shares": {
+      "Murat": 0,
+      "Yusuf": 100,
+      "Cüneyt": 0,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp3rn1g",
+    "type": "sell",
+    "date": "2026-05-01",
+    "ticker": "UAMY",
+    "qty": 91.7043222,
+    "price": 12.02,
+    "amount": 1100.79,
+    "note": "",
+    "shares": {
+      "Murat": 0,
+      "Yusuf": 100,
+      "Cüneyt": 0,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp46tjo",
+    "type": "deposit",
+    "date": "2026-05-04",
+    "ticker": "",
+    "qty": 0,
+    "price": 0,
+    "amount": 1770.93,
+    "note": "",
+    "shares": {
+      "Murat": 100,
+      "Yusuf": 0,
+      "Cüneyt": 0,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp5zpk4",
+    "type": "deposit",
+    "date": "2026-05-04",
+    "ticker": "",
+    "qty": 0,
+    "price": 0,
+    "amount": 420,
+    "note": "",
+    "shares": {
+      "Murat": 0,
+      "Yusuf": 0,
+      "Cüneyt": 100,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp6axhn",
+    "type": "buy",
+    "date": "2026-05-06",
+    "ticker": "UAMY",
+    "qty": 286.35478261,
+    "price": 11.49,
+    "amount": 3291.72,
+    "note": "",
+    "shares": {
+      "Murat": 53.7996,
+      "Yusuf": 33.4411,
+      "Cüneyt": 12.7593,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp7oa3r",
+    "type": "sell",
+    "date": "2026-05-07",
+    "ticker": "UAMY",
+    "qty": 286.35478261,
+    "price": 11.89,
+    "amount": 3403.26,
+    "note": "",
+    "shares": {
+      "Murat": 53.7996,
+      "Yusuf": 33.4411,
+      "Cüneyt": 12.7593,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp8bhyz",
+    "type": "deposit",
+    "date": "2026-05-07",
+    "ticker": "",
+    "qty": 0,
+    "price": 0,
+    "amount": 10186.91,
+    "note": "",
+    "shares": {
+      "Murat": 100,
+      "Yusuf": 0,
+      "Cüneyt": 0,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp9dnmo",
+    "type": "buy",
+    "date": "2026-05-08",
+    "ticker": "UAMY",
+    "qty": 306.97769848,
+    "price": 11.21,
+    "amount": 3442.72,
+    "note": "",
+    "shares": {
+      "Murat": 88.43047,
+      "Yusuf": 8.37434,
+      "Cüneyt": 3.19519,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp10pwut",
+    "type": "buy",
+    "date": "2026-05-14",
+    "ticker": "UAMY",
+    "qty": 287.36440678,
+    "price": 9.44,
+    "amount": 2714.22,
+    "note": "",
+    "shares": {
+      "Murat": 88.43047,
+      "Yusuf": 8.37434,
+      "Cüneyt": 3.19519,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp114div",
+    "type": "buy",
+    "date": "2026-05-14",
+    "ticker": "UAMY",
+    "qty": 796.51982851,
+    "price": 9.33,
+    "amount": 7433.03,
+    "note": "",
+    "shares": {
+      "Murat": 88.43047,
+      "Yusuf": 8.37434,
+      "Cüneyt": 3.19519,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp12khs0",
+    "type": "sell",
+    "date": "2026-05-15",
+    "ticker": "UAMY",
+    "qty": 1390.86193377,
+    "price": 8.47,
+    "amount": 11779.1,
+    "note": "",
+    "shares": {
+      "Murat": 88.43047,
+      "Yusuf": 8.37434,
+      "Cüneyt": 3.19519,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp133kvc",
+    "type": "buy",
+    "date": "2026-05-15",
+    "ticker": "RKLB",
+    "qty": 94.13907761,
+    "price": 125.11,
+    "amount": 11779.24,
+    "note": "",
+    "shares": {
+      "Murat": 88.43047,
+      "Yusuf": 8.37434,
+      "Cüneyt": 3.19519,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp14apty",
+    "type": "sell",
+    "date": "2026-05-20",
+    "ticker": "RKLB",
+    "qty": 94,
+    "price": 134.25,
+    "amount": 12618,
+    "note": "",
+    "shares": {
+      "Murat": 88.43047,
+      "Yusuf": 8.37434,
+      "Cüneyt": 3.19519,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp15j0xf",
+    "type": "buy",
+    "date": "2026-05-20",
+    "ticker": "COHR",
+    "qty": 35.63084614,
+    "price": 354.08,
+    "amount": 12617.67,
+    "note": "",
+    "shares": {
+      "Murat": 88.43047,
+      "Yusuf": 8.37434,
+      "Cüneyt": 3.19519,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp16cer9",
+    "type": "sell",
+    "date": "2026-05-21",
+    "ticker": "COHR",
+    "qty": 35.63084614,
+    "price": 367.65,
+    "amount": 13098.18,
+    "note": "",
+    "shares": {
+      "Murat": 88.43047,
+      "Yusuf": 8.37434,
+      "Cüneyt": 3.19519,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp17bljw",
+    "type": "buy",
+    "date": "2026-05-21",
+    "ticker": "RKLB",
+    "qty": 102.67152712,
+    "price": 127.56,
+    "amount": 13098.28,
+    "note": "",
+    "shares": {
+      "Murat": 88.43047,
+      "Yusuf": 8.37434,
+      "Cüneyt": 3.19519,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp18uv32",
+    "type": "sell",
+    "date": "2026-05-22",
+    "ticker": "RKLB",
+    "qty": 102.81060473,
+    "price": 135.36,
+    "amount": 13914.94,
+    "note": "",
+    "shares": {
+      "Murat": 88.43047,
+      "Yusuf": 8.37434,
+      "Cüneyt": 3.19519,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp19ylxw",
+    "type": "withdraw",
+    "date": "2026-05-22",
+    "ticker": "",
+    "qty": 0,
+    "price": 0,
+    "amount": 1065.51,
+    "note": "",
+    "shares": {
+      "Murat": 100,
+      "Yusuf": 0,
+      "Cüneyt": 0,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp20wi72",
+    "type": "buy",
+    "date": "2026-05-22",
+    "ticker": "NBIS",
+    "qty": 58,
+    "price": 221.53,
+    "amount": 12850.24,
+    "note": "",
+    "shares": {
+      "Murat": 87.47111,
+      "Yusuf": 9.06875,
+      "Cüneyt": 3.46014,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp21kygl",
+    "type": "deposit",
+    "date": "2026-05-26",
+    "ticker": "",
+    "qty": 0,
+    "price": 0,
+    "amount": 750,
+    "note": "",
+    "shares": {
+      "Murat": 100,
+      "Yusuf": 0,
+      "Cüneyt": 0,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp22vddu",
+    "type": "buy",
+    "date": "2026-05-26",
+    "ticker": "NBIS",
+    "qty": 3.53716743,
+    "price": 211.61,
+    "amount": 750,
+    "note": "",
+    "shares": {
+      "Murat": 100,
+      "Yusuf": 0,
+      "Cüneyt": 0,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp23q6qj",
+    "type": "sell",
+    "date": "2026-05-27",
+    "ticker": "NBIS",
+    "qty": 61.53716743,
+    "price": 201.8,
+    "amount": 12416.7,
+    "note": "",
+    "shares": {
+      "Murat": 88.16206,
+      "Yusuf": 8.56862,
+      "Cüneyt": 3.26932,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp24lsim",
+    "type": "buy",
+    "date": "2026-05-27",
+    "ticker": "UAMY",
+    "qty": 1433.66628176,
+    "price": 8.64,
+    "amount": 12388.38,
+    "note": "",
+    "shares": {
+      "Murat": 88.16572,
+      "Yusuf": 8.56597,
+      "Cüneyt": 3.26831,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp25yrqe",
+    "type": "sell",
+    "date": "2026-05-28",
+    "ticker": "UAMY",
+    "qty": 1433.66628176,
+    "price": 8.98,
+    "amount": 12872.82,
+    "note": "",
+    "shares": {
+      "Murat": 88.16572,
+      "Yusuf": 8.56597,
+      "Cüneyt": 3.26831,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp26j8o1",
+    "type": "buy",
+    "date": "2026-05-28",
+    "ticker": "CRDO",
+    "qty": 59.63561986,
+    "price": 216.34,
+    "amount": 12903.07,
+    "note": "",
+    "shares": {
+      "Murat": 88.16572,
+      "Yusuf": 8.56597,
+      "Cüneyt": 3.26831,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp27t33w",
+    "type": "buy",
+    "date": "2026-05-29",
+    "ticker": "TEM",
+    "qty": 268.29605135,
+    "price": 51.41,
+    "amount": 13794.6,
+    "note": "",
+    "shares": {
+      "Murat": 87.50249,
+      "Yusuf": 8.56597,
+      "Cüneyt": 3.26831,
+      "Mehmet Emin": 0.66323
+    }
+  },
+  {
+    "id": "imp28dwev",
+    "type": "sell",
+    "date": "2026-05-30",
+    "ticker": "CRDO",
+    "qty": 59.63561986,
+    "price": 231.34,
+    "amount": 13794.6,
+    "note": "",
+    "shares": {
+      "Murat": 88.16572,
+      "Yusuf": 8.56597,
+      "Cüneyt": 3.26831,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp29pkuh",
+    "type": "withdraw",
+    "date": "2026-05-30",
+    "ticker": "",
+    "qty": 0,
+    "price": 0,
+    "amount": 91.5,
+    "note": "",
+    "shares": {
+      "Murat": 100,
+      "Yusuf": 0,
+      "Cüneyt": 0,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp30rv7b",
+    "type": "deposit",
+    "date": "2026-05-30",
+    "ticker": "",
+    "qty": 0,
+    "price": 0,
+    "amount": 91.5,
+    "note": "",
+    "shares": {
+      "Murat": 0,
+      "Yusuf": 0,
+      "Cüneyt": 0,
+      "Mehmet Emin": 100
+    }
+  },
+  {
+    "id": "imp310gft",
+    "type": "sell",
+    "date": "2026-06-01",
+    "ticker": "TEM",
+    "qty": 268.29605135,
+    "price": 53.1,
+    "amount": 14245.02,
+    "note": "",
+    "shares": {
+      "Murat": 87.50249,
+      "Yusuf": 8.56597,
+      "Cüneyt": 3.26831,
+      "Mehmet Emin": 0.66323
+    }
+  },
+  {
+    "id": "imp32n2q8",
+    "type": "buy",
+    "date": "2026-06-01",
+    "ticker": "RKLB",
+    "qty": 113.43018918,
+    "price": 125.57,
+    "amount": 14244.93,
+    "note": "",
+    "shares": {
+      "Murat": 87.50249,
+      "Yusuf": 8.56597,
+      "Cüneyt": 3.26831,
+      "Mehmet Emin": 0.66323
+    }
+  },
+  {
+    "id": "imp33qp04",
+    "type": "sell",
+    "date": "2026-06-02",
+    "ticker": "RKLB",
+    "qty": 113.43018918,
+    "price": 126.5001,
+    "amount": 14347.43,
+    "note": "",
+    "shares": {
+      "Murat": 87.50249,
+      "Yusuf": 8.56597,
+      "Cüneyt": 3.26831,
+      "Mehmet Emin": 0.66323
+    }
+  },
+  {
+    "id": "imp348e4v",
+    "type": "withdraw",
+    "date": "2026-06-02",
+    "ticker": "",
+    "qty": 0,
+    "price": 0,
+    "amount": 629.93,
+    "note": "",
+    "shares": {
+      "Murat": 100,
+      "Yusuf": 0,
+      "Cüneyt": 0,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp356qme",
+    "type": "buy",
+    "date": "2026-06-02",
+    "ticker": "TEM",
+    "qty": 270,
+    "price": 50.8,
+    "amount": 13717.5,
+    "note": "",
+    "shares": {
+      "Murat": 86.92864,
+      "Yusuf": 8.95929,
+      "Cüneyt": 3.41838,
+      "Mehmet Emin": 0.69369
+    }
+  },
+  {
+    "id": "imp369hpo",
+    "type": "sell",
+    "date": "2026-06-03",
+    "ticker": "TEM",
+    "qty": 270,
+    "price": 47.02,
+    "amount": 12693.9,
+    "note": "",
+    "shares": {
+      "Murat": 86.92864,
+      "Yusuf": 8.95929,
+      "Cüneyt": 3.41838,
+      "Mehmet Emin": 0.69369
+    }
+  },
+  {
+    "id": "imp37g4uu",
+    "type": "deposit",
+    "date": "2026-06-03",
+    "ticker": "",
+    "qty": 0,
+    "price": 0,
+    "amount": 250,
+    "note": "",
+    "shares": {
+      "Murat": 100,
+      "Yusuf": 0,
+      "Cüneyt": 0,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp38mj8p",
+    "type": "buy",
+    "date": "2026-06-04",
+    "ticker": "RKLB",
+    "qty": 111.919750951,
+    "price": 115.64,
+    "amount": 12943.9,
+    "note": "",
+    "shares": {
+      "Murat": 87.18108,
+      "Yusuf": 8.78627,
+      "Cüneyt": 3.35236,
+      "Mehmet Emin": 0.68029
+    }
+  },
+  {
+    "id": "imp39itkp",
+    "type": "sell",
+    "date": "2026-06-04",
+    "ticker": "RKLB",
+    "qty": 111.91975095,
+    "price": 117.5,
+    "amount": 13149.07,
+    "note": "",
+    "shares": {
+      "Murat": 87.18108,
+      "Yusuf": 8.78627,
+      "Cüneyt": 3.35236,
+      "Mehmet Emin": 0.68029
+    }
+  },
+  {
+    "id": "imp40h1ws",
+    "type": "buy",
+    "date": "2026-06-04",
+    "ticker": "MRVL",
+    "qty": 42.851085326,
+    "price": 306.6,
+    "amount": 13139.64,
+    "note": "",
+    "shares": {
+      "Murat": 87.18108,
+      "Yusuf": 8.78627,
+      "Cüneyt": 3.35236,
+      "Mehmet Emin": 0.68029
+    }
+  },
+  {
+    "id": "imp41dt5b",
+    "type": "sell",
+    "date": "2026-06-04",
+    "ticker": "MRVL",
+    "qty": 42.85108533,
+    "price": 311.6,
+    "amount": 13350.9,
+    "note": "",
+    "shares": {
+      "Murat": 87.18108,
+      "Yusuf": 8.78627,
+      "Cüneyt": 3.35236,
+      "Mehmet Emin": 0.68029
+    }
+  },
+  {
+    "id": "imp42zvhf",
+    "type": "buy",
+    "date": "2026-06-04",
+    "ticker": "RKLB",
+    "qty": 113,
+    "price": 118.2,
+    "amount": 13358.1,
+    "note": "",
+    "shares": {
+      "Murat": 87.18108,
+      "Yusuf": 8.78627,
+      "Cüneyt": 3.35236,
+      "Mehmet Emin": 0.68029
+    }
+  },
+  {
+    "id": "imp435v6i",
+    "type": "sell",
+    "date": "2026-06-04",
+    "ticker": "RKLB",
+    "qty": 113,
+    "price": 121,
+    "amount": 13671.5,
+    "note": "",
+    "shares": {
+      "Murat": 87.18108,
+      "Yusuf": 8.78627,
+      "Cüneyt": 3.35236,
+      "Mehmet Emin": 0.68029
+    }
+  },
+  {
+    "id": "imp44fw19",
+    "type": "buy",
+    "date": "2026-06-04",
+    "ticker": "UAMY",
+    "qty": 1600,
+    "price": 8.54,
+    "amount": 13665.5,
+    "note": "",
+    "shares": {
+      "Murat": 87.18108,
+      "Yusuf": 8.78627,
+      "Cüneyt": 3.35236,
+      "Mehmet Emin": 0.68029
+    }
+  },
+  {
+    "id": "imp45tawu",
+    "type": "deposit",
+    "date": "2026-06-05",
+    "ticker": "",
+    "qty": 0,
+    "price": 0,
+    "amount": 161.64,
+    "note": "",
+    "shares": {
+      "Murat": 0,
+      "Yusuf": 0,
+      "Cüneyt": 100,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp46iuqg",
+    "type": "deposit",
+    "date": "2026-06-05",
+    "ticker": "",
+    "qty": 0,
+    "price": 0,
+    "amount": 3338.36,
+    "note": "",
+    "shares": {
+      "Murat": 100,
+      "Yusuf": 0,
+      "Cüneyt": 0,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp47biep",
+    "type": "buy",
+    "date": "2026-06-05",
+    "ticker": "UAMY",
+    "qty": 407.7244186,
+    "price": 8.6,
+    "amount": 3507.93,
+    "note": "",
+    "shares": {
+      "Murat": 95.382,
+      "Yusuf": 0,
+      "Cüneyt": 4.618,
+      "Mehmet Emin": 0
+    }
+  },
+  {
+    "id": "imp48r3zr",
+    "type": "sell",
+    "date": "2026-06-05",
+    "ticker": "UAMY",
+    "qty": 2007.7244186,
+    "price": 7.87,
+    "amount": 15799.29,
+    "note": "",
+    "shares": {
+      "Murat": 88.85222,
+      "Yusuf": 6.99578,
+      "Cüneyt": 3.61034,
+      "Mehmet Emin": 0.54166
+    }
+  },
+  {
+    "id": "imp49zv2u",
+    "type": "buy",
+    "date": "2026-06-05",
+    "ticker": "CRDO",
+    "qty": 72.66,
+    "price": 217.5,
+    "amount": 15805.05,
+    "note": "",
+    "shares": {
+      "Murat": 88.84142,
+      "Yusuf": 7.0066,
+      "Cüneyt": 3.60948,
+      "Mehmet Emin": 0.5425
+    }
+  },
+  {
+    "id": "imp50qfer",
+    "type": "sell",
+    "date": "2026-06-05",
+    "ticker": "CRDO",
+    "qty": 72.66,
+    "price": 208.5,
+    "amount": 15148.11,
+    "note": "",
+    "shares": {
+      "Murat": 88.84142,
+      "Yusuf": 7.0066,
+      "Cüneyt": 3.60948,
+      "Mehmet Emin": 0.5425
+    }
+  },
+  {
+    "id": "imp51oj61",
+    "type": "buy",
+    "date": "2026-06-05",
+    "ticker": "NBIS",
+    "qty": 68.31143605,
+    "price": 221.61,
+    "amount": 15140,
+    "note": "",
+    "shares": {
+      "Murat": 88.84142,
+      "Yusuf": 7.0066,
+      "Cüneyt": 3.60948,
+      "Mehmet Emin": 0.5425
+    }
+  },
+  {
+    "id": "imp52wk14",
+    "type": "sell",
+    "date": "2026-06-05",
+    "ticker": "NBIS",
+    "qty": 40,
+    "price": 224.74,
+    "amount": 8988.1,
+    "note": "",
+    "shares": {
+      "Murat": 88.84142,
+      "Yusuf": 7.0066,
+      "Cüneyt": 3.60948,
+      "Mehmet Emin": 0.5425
+    }
+  },
+  {
+    "id": "imp53qy42",
+    "type": "sell",
+    "date": "2026-06-05",
+    "ticker": "NBIS",
+    "qty": 28.31143605,
+    "price": 221.85,
+    "amount": 6279.39,
+    "note": "",
+    "shares": {
+      "Murat": 88.84155,
+      "Yusuf": 7.00652,
+      "Cüneyt": 3.60944,
+      "Mehmet Emin": 0.54249
+    }
+  },
+  {
+    "id": "imp54si4u",
+    "type": "buy",
+    "date": "2026-06-05",
+    "ticker": "RKLB",
+    "qty": 41,
+    "price": 109.3,
+    "amount": 4482.8,
+    "note": "",
+    "shares": {
+      "Murat": 88.84155,
+      "Yusuf": 7.00652,
+      "Cüneyt": 3.60944,
+      "Mehmet Emin": 0.54249
+    }
+  },
+  {
+    "id": "imp55dq3p",
+    "type": "buy",
+    "date": "2026-06-05",
+    "ticker": "COHR",
+    "qty": 12.00693148,
+    "price": 375.01,
+    "amount": 4504.22,
+    "note": "",
+    "shares": {
+      "Murat": 88.84155,
+      "Yusuf": 7.00652,
+      "Cüneyt": 3.60944,
+      "Mehmet Emin": 0.54249
+    }
+  },
+  {
+    "id": "imp56ojte",
+    "type": "buy",
+    "date": "2026-06-05",
+    "ticker": "UAMY",
+    "qty": 400,
+    "price": 7.77,
+    "amount": 3109.5,
+    "note": "",
+    "shares": {
+      "Murat": 88.84155,
+      "Yusuf": 7.00652,
+      "Cüneyt": 3.60944,
+      "Mehmet Emin": 0.54249
+    }
+  },
+  {
+    "id": "imp57s80s",
+    "type": "buy",
+    "date": "2026-06-05",
+    "ticker": "SGML",
+    "qty": 65,
+    "price": 13.5,
+    "amount": 879,
+    "note": "",
+    "shares": {
+      "Murat": 88.84155,
+      "Yusuf": 7.00652,
+      "Cüneyt": 3.60944,
+      "Mehmet Emin": 0.54249
+    }
+  },
+  {
+    "id": "imp5885qx",
+    "type": "buy",
+    "date": "2026-06-05",
+    "ticker": "CRDO",
+    "qty": 11.18557406,
+    "price": 204.77,
+    "amount": 2291.97,
+    "note": "",
+    "shares": {
+      "Murat": 88.84155,
+      "Yusuf": 7.00652,
+      "Cüneyt": 3.60944,
+      "Mehmet Emin": 0.54249
+    }
+  }
+];
+    const STORAGE_KEY = 'portfolio_v3';
+    const owners = ['Murat', 'Yusuf', 'Cüneyt', 'Mehmet Emin'];
+    const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    const state = {
+      owners: owners,
+      transactions: transactions,
+      theme: existing.theme || 'dark'
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    document.getElementById('result').innerHTML = '<p class="result ok">✓ 58 işlem yüklendi! Şimdi muratyk1.github.io/portfolio-tracker adresine gidin.</p>';
+  } catch(e) {
+    document.getElementById('result').innerHTML = '<p class="result err">Hata: ' + e.message + '</p>';
+  }
+}
+</script>
+</body>
+</html>
