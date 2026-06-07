@@ -477,7 +477,6 @@ function renderStocks(){
 // ═══════════════════════════════════════════════
 function renderTransactions(){
   const txs=[...state.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date));
-  if(!txs.length) return ownerPills()+'<div class="empty">No transactions yet.</div>';
   const filtered=selectedOwner?txs.filter(tx=>tx.shares&&(tx.shares[selectedOwner]||0)>0):txs;
   return `${ownerPills()}
     <div class="action-row">
@@ -485,8 +484,10 @@ function renderTransactions(){
       <button class="action-btn" onclick="importCSV()">⬆ Import</button>
       <button class="action-btn" onclick="clearAll()">🗑 Clear</button>
     </div>
-    <div class="section-title">${filtered.length} transactions</div>
-    ${filtered.map(tx=>txCard(tx,true)).join('')}`;
+    ${filtered.length===0
+      ? '<div class="empty">No transactions yet.</div>'
+      : `<div class="section-title">${filtered.length} transactions</div>${filtered.map(tx=>txCard(tx,true)).join('')}`
+    }`;
 }
 
 function txCard(tx,showDelete=false){
